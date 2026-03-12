@@ -1,0 +1,574 @@
+SQL> SELECT customer_id
+  2  FROM orders
+  3  WHERE EXTRACT(YEAR FROM order_date)=2024
+  4  GROUP BY customer_id
+  5  HAVING COUNT(DISTINCT EXTRACT(MONTH FROM order_date))=12;
+
+no rows selected
+
+SQL> SELECT oi.order_id
+  2  FROM order_items oi,products p
+  3  WHERE oi.product_id=p.product_id
+  4  GROUP BY oi.order_id
+  5  HAVING COUNT(*)=1
+  6  AND MAX(p.price)=(SELECT MAX(price) FROM products);
+
+  ORDER_ID
+----------
+         4
+
+SQL> SELECT *
+  2  FROM
+  3  (
+  4  SELECT o.customer_id,
+  5  COUNT(DISTINCT oi.product_id) product_count,
+  6  RANK() OVER(ORDER BY COUNT(DISTINCT oi.product_id) DESC) r
+  7  FROM orders o,order_items oi
+  8  WHERE o.order_id=oi.order_id
+  9  GROUP BY o.customer_id
+ 10  )
+ 11  WHERE r<=3;
+
+CUSTOMER_ID PRODUCT_COUNT          R
+----------- ------------- ----------
+          3             6          1
+          1             5          2
+          2             4          3
+
+SQL> SELECT o.order_id
+  2  FROM orders o,payments p
+  3  WHERE o.order_id=p.order_id
+  4  AND p.payment_date>o.order_date+2;
+
+  ORDER_ID
+----------
+         3
+
+SQL> SELECT order_id,product_id,COUNT(*)
+  2  FROM order_items
+  3  GROUP BY order_id,product_id
+  4  HAVING COUNT(*)>1;
+
+no rows selected
+
+SQL> SELECT product_id
+  2  FROM order_items
+  3  GROUP BY product_id
+  4  HAVING MIN(quantity)>1;
+
+PRODUCT_ID
+----------
+         7
+
+SQL> SELECT *
+  2  FROM inventory i
+  3  WHERE NOT EXISTS
+  4  (
+  5  SELECT 1
+  6  FROM order_items oi,orders o
+  7  WHERE oi.order_id=o.order_id
+  8  AND oi.product_id=i.product_id
+  9  AND o.order_date>SYSDATE-90
+ 10  );
+
+INVENTORY_ID PRODUCT_ID QUANTITY_ON_HAND LAST_UPDA
+------------ ---------- ---------------- ---------
+           1          1               15 10-JAN-24
+           2          2               80 15-FEB-24
+           3          3               50 01-MAR-24
+           4          4               10 20-JAN-24
+           5          5               30 05-APR-24
+           6          6               18 28-FEB-24
+           7          7                5 10-MAY-24
+           8          8               25 15-MAR-24
+           9          9               40 01-DEC-23
+          10         10               12 01-JUN-24
+
+10 rows selected.
+
+SQL> SELECT *
+  2  FROM payments
+  3  WHERE payment_method IS NULL;
+
+PAYMENT_ID   ORDER_ID     AMOUNT PAYMENT_METHOD                                     PAYMENT_D
+---------- ---------- ---------- -------------------------------------------------- ---------
+         8          9       2700                                                    06-MAY-24
+
+SQL> WITH stock_value AS
+  2  (
+  3  SELECT p.product_id,
+  4  p.price*i.quantity_on_hand total_stock_value
+  5  FROM products p,inventory i
+  6  WHERE p.product_id=i.product_id
+  7  )
+  8  SELECT *
+  9  FROM stock_value;
+
+PRODUCT_ID TOTAL_STOCK_VALUE
+---------- -----------------
+         1           1125000
+         2             40000
+         3             60000
+         4            150000
+         5             90000
+         6             45000
+         7              4000
+         8            150000
+         9             60000
+        10             24000
+
+10 rows selected.
+
+SQL> WITH monthly_sales AS
+  2  (
+  3  SELECT EXTRACT(MONTH FROM o.order_date) month,
+  4  SUM(oi.quantity*p.price) total_sales
+  5  FROM orders o,order_items oi,products p
+  6  WHERE o.order_id=oi.order_id
+  7  AND oi.product_id=p.product_id
+  8  GROUP BY EXTRACT(MONTH FROM o.order_date)
+  9  )
+ 10  SELECT *
+ 11  FROM monthly_sales
+ 12  WHERE total_sales>
+ 13  (
+ 14  SELECT AVG(total_sales)
+ 15  FROM monthly_sales
+ 16  );
+
+     MONTH TOTAL_SALES
+---------- -----------
+         1       95100
+         2       82900
+         5       92700
+         7       76700
+
+SQL> WITH dates(dt) AS
+  2  (
+  3  SELECT DATE '2024-01-01'
+  4  FROM dual
+  5  UNION ALL
+  6  SELECT dt+1
+  7  FROM dates
+  8  WHERE dt<DATE '2024-12-31'
+  9  )
+ 10  SELECT d.dt,o.order_id
+ 11  FROM dates d,orders o
+ 12  WHERE d.dt=o.order_date(+);
+WITH dates(dt) AS
+          *
+ERROR at line 1:
+ORA-32033: unsupported column aliasing
+
+
+SQL> SELECT d.dt,o.order_id
+  2  FROM
+  3  (
+  4  SELECT DATE '2024-01-01'+LEVEL-1 dt
+  5  FROM dual
+  6  CONNECT BY LEVEL<=365
+  7  )d,orders o
+  8  WHERE d.dt=o.order_date(+);
+
+DT          ORDER_ID
+--------- ----------
+05-JAN-24          1
+18-JAN-24          2
+02-FEB-24          3
+14-FEB-24          4
+10-MAR-24          5
+22-MAR-24          6
+01-APR-24          7
+15-APR-24          8
+05-MAY-24          9
+20-MAY-24         10
+03-JUN-24         11
+18-JUN-24         12
+07-JUL-24         13
+25-JUL-24         14
+10-AUG-24         15
+13-SEP-24
+21-MAY-24
+30-JUN-24
+15-JUL-24
+26-MAR-24
+08-AUG-24
+04-AUG-24
+12-SEP-24
+23-JUL-24
+03-AUG-24
+01-NOV-24
+12-DEC-24
+02-JAN-24
+10-MAY-24
+20-APR-24
+24-JUL-24
+03-OCT-24
+14-MAY-24
+21-OCT-24
+03-NOV-24
+29-JAN-24
+26-JAN-24
+24-JUN-24
+06-DEC-24
+25-MAY-24
+22-JUN-24
+11-NOV-24
+06-MAR-24
+29-JUN-24
+04-OCT-24
+30-SEP-24
+13-JUN-24
+24-NOV-24
+05-APR-24
+11-OCT-24
+15-FEB-24
+22-FEB-24
+13-AUG-24
+09-JUN-24
+16-JUL-24
+06-JAN-24
+01-FEB-24
+22-SEP-24
+08-NOV-24
+26-DEC-24
+14-DEC-24
+28-MAR-24
+28-JAN-24
+26-OCT-24
+20-JUN-24
+14-APR-24
+21-APR-24
+09-OCT-24
+16-APR-24
+28-OCT-24
+27-AUG-24
+04-JUN-24
+22-JUL-24
+04-MAR-24
+06-NOV-24
+17-JUN-24
+30-AUG-24
+24-FEB-24
+29-AUG-24
+09-SEP-24
+08-JAN-24
+13-APR-24
+17-MAR-24
+21-NOV-24
+15-NOV-24
+04-NOV-24
+25-AUG-24
+07-NOV-24
+05-OCT-24
+24-APR-24
+16-AUG-24
+16-SEP-24
+13-FEB-24
+29-DEC-24
+11-JUL-24
+27-APR-24
+11-MAR-24
+18-DEC-24
+08-MAR-24
+05-SEP-24
+23-JUN-24
+27-OCT-24
+03-MAY-24
+04-DEC-24
+07-JAN-24
+31-AUG-24
+23-SEP-24
+21-JUN-24
+25-FEB-24
+09-NOV-24
+06-SEP-24
+05-AUG-24
+06-OCT-24
+02-DEC-24
+10-OCT-24
+18-APR-24
+24-MAY-24
+13-MAR-24
+30-JAN-24
+12-JUL-24
+08-APR-24
+06-JUL-24
+01-OCT-24
+14-AUG-24
+19-NOV-24
+02-NOV-24
+02-AUG-24
+22-AUG-24
+08-OCT-24
+30-JUL-24
+15-JAN-24
+28-JUN-24
+04-JUL-24
+23-MAY-24
+23-JAN-24
+09-DEC-24
+28-DEC-24
+12-JUN-24
+08-MAY-24
+03-SEP-24
+04-FEB-24
+26-JUL-24
+05-JUN-24
+12-FEB-24
+05-FEB-24
+13-JAN-24
+21-JAN-24
+16-DEC-24
+19-MAR-24
+10-NOV-24
+17-FEB-24
+28-FEB-24
+29-SEP-24
+06-FEB-24
+14-JUL-24
+06-APR-24
+13-MAY-24
+09-JAN-24
+10-APR-24
+19-FEB-24
+28-SEP-24
+07-MAY-24
+23-DEC-24
+21-SEP-24
+14-JAN-24
+10-JUL-24
+20-AUG-24
+12-OCT-24
+08-DEC-24
+12-NOV-24
+19-JUL-24
+02-MAY-24
+29-JUL-24
+31-MAR-24
+17-DEC-24
+20-DEC-24
+23-APR-24
+21-FEB-24
+01-MAY-24
+01-JAN-24
+04-SEP-24
+01-SEP-24
+26-FEB-24
+16-FEB-24
+24-DEC-24
+05-JUL-24
+05-DEC-24
+20-JAN-24
+20-MAR-24
+11-JUN-24
+01-AUG-24
+03-APR-24
+24-OCT-24
+27-DEC-24
+27-JUN-24
+15-DEC-24
+09-APR-24
+21-JUL-24
+02-APR-24
+24-SEP-24
+17-MAY-24
+17-SEP-24
+31-JUL-24
+19-APR-24
+20-SEP-24
+07-SEP-24
+21-AUG-24
+06-JUN-24
+19-AUG-24
+04-MAY-24
+20-NOV-24
+30-OCT-24
+09-AUG-24
+21-DEC-24
+07-DEC-24
+02-MAR-24
+10-JUN-24
+02-OCT-24
+14-SEP-24
+01-MAR-24
+28-NOV-24
+08-JUN-24
+23-FEB-24
+19-JAN-24
+18-MAR-24
+20-OCT-24
+23-NOV-24
+16-MAR-24
+02-SEP-24
+29-MAY-24
+15-AUG-24
+15-OCT-24
+19-DEC-24
+26-NOV-24
+02-JUL-24
+12-JAN-24
+17-JAN-24
+06-MAY-24
+18-MAY-24
+09-JUL-24
+26-JUN-24
+10-FEB-24
+26-AUG-24
+22-NOV-24
+24-JAN-24
+16-JAN-24
+12-MAY-24
+13-DEC-24
+26-SEP-24
+26-MAY-24
+07-MAR-24
+14-OCT-24
+07-FEB-24
+11-FEB-24
+22-OCT-24
+09-MAR-24
+14-JUN-24
+25-MAR-24
+14-MAR-24
+27-FEB-24
+19-OCT-24
+14-NOV-24
+09-FEB-24
+29-FEB-24
+03-FEB-24
+23-OCT-24
+17-NOV-24
+04-JAN-24
+11-SEP-24
+21-MAR-24
+11-APR-24
+13-OCT-24
+17-APR-24
+22-MAY-24
+11-AUG-24
+12-MAR-24
+05-NOV-24
+20-FEB-24
+17-JUL-24
+30-APR-24
+02-JUN-24
+18-OCT-24
+13-NOV-24
+25-SEP-24
+05-MAR-24
+16-NOV-24
+25-JAN-24
+16-OCT-24
+09-MAY-24
+16-MAY-24
+10-JAN-24
+29-MAR-24
+11-MAY-24
+29-APR-24
+31-OCT-24
+25-DEC-24
+27-NOV-24
+
+DT          ORDER_ID
+--------- ----------
+12-APR-24
+06-AUG-24
+31-JAN-24
+28-JUL-24
+28-APR-24
+17-OCT-24
+27-JUL-24
+27-SEP-24
+01-JUL-24
+08-SEP-24
+20-JUL-24
+18-SEP-24
+28-MAY-24
+03-JUL-24
+27-JAN-24
+30-NOV-24
+22-DEC-24
+28-AUG-24
+04-APR-24
+18-NOV-24
+15-JUN-24
+08-FEB-24
+22-APR-24
+19-MAY-24
+31-MAY-24
+12-AUG-24
+23-AUG-24
+07-JUN-24
+27-MAY-24
+17-AUG-24
+11-DEC-24
+03-DEC-24
+01-DEC-24
+27-MAR-24
+30-DEC-24
+07-AUG-24
+25-APR-24
+15-MAR-24
+30-MAR-24
+26-APR-24
+07-OCT-24
+29-OCT-24
+25-JUN-24
+25-NOV-24
+25-OCT-24
+24-MAR-24
+24-AUG-24
+18-FEB-24
+19-SEP-24
+10-DEC-24
+16-JUN-24
+10-SEP-24
+03-JAN-24
+22-JAN-24
+11-JAN-24
+30-MAY-24
+19-JUN-24
+15-MAY-24
+03-MAR-24
+07-APR-24
+18-JUL-24
+08-JUL-24
+01-JUN-24
+29-NOV-24
+15-SEP-24
+13-JUL-24
+18-AUG-24
+23-MAR-24
+
+365 rows selected.
+
+SQL> WITH price_tier AS
+  2  (
+  3  SELECT product_id,
+  4  CASE
+  5  WHEN price<100 THEN 'LOW'
+  6  WHEN price<500 THEN 'MEDIUM'
+  7  ELSE 'HIGH'
+  8  END tier
+  9  FROM products
+ 10  )
+ 11  SELECT *
+ 12  FROM price_tier;
+
+PRODUCT_ID TIER
+---------- ------
+         1 HIGH
+         2 HIGH
+         3 HIGH
+         4 HIGH
+         5 HIGH
+         6 HIGH
+         7 HIGH
+         8 HIGH
+         9 HIGH
+        10 HIGH
+
+10 rows selected.
+
+SQL> spool off
