@@ -1,3 +1,5 @@
+Q13. Find customers who placed orders in each month of a given year.
+
 SQL> SELECT customer_id
   2  FROM orders
   3  WHERE EXTRACT(YEAR FROM order_date)=2024
@@ -5,6 +7,8 @@ SQL> SELECT customer_id
   5  HAVING COUNT(DISTINCT EXTRACT(MONTH FROM order_date))=12;
 
 no rows selected
+----------------------------------------------------------------------------------------------------------
+Q14. List orders where the highest-priced item is the only item ordered.-->
 
 SQL> SELECT oi.order_id
   2  FROM order_items oi,products p
@@ -16,6 +20,8 @@ SQL> SELECT oi.order_id
   ORDER_ID
 ----------
          4
+-----------------------------------------------------------------------------------------------------
+Q15. Retrieve top 3 customers with the most distinct products ordered.-->
 
 SQL> SELECT *
   2  FROM
@@ -34,6 +40,8 @@ CUSTOMER_ID PRODUCT_COUNT          R
           3             6          1
           1             5          2
           2             4          3
+---------------------------------------------------------------------------------------------------
+Q16. Identify payments made after 48 hours from order_date-->
 
 SQL> SELECT o.order_id
   2  FROM orders o,payments p
@@ -43,6 +51,8 @@ SQL> SELECT o.order_id
   ORDER_ID
 ----------
          3
+---------------------------------------------------------------------------------------------------------
+Q17. Find duplicate product purchases within the same order.-->
 
 SQL> SELECT order_id,product_id,COUNT(*)
   2  FROM order_items
@@ -50,6 +60,8 @@ SQL> SELECT order_id,product_id,COUNT(*)
   4  HAVING COUNT(*)>1;
 
 no rows selected
+-------------------------------------------------------------------------------------------------------------
+Q18. List products ordered consistently in quantities > 1.-->
 
 SQL> SELECT product_id
   2  FROM order_items
@@ -59,6 +71,8 @@ SQL> SELECT product_id
 PRODUCT_ID
 ----------
          7
+------------------------------------------------------------------------------------------------------------------
+Q19. Find inventory not used in orders for over 90 days.--->
 
 SQL> SELECT *
   2  FROM inventory i
@@ -85,6 +99,8 @@ INVENTORY_ID PRODUCT_ID QUANTITY_ON_HAND LAST_UPDA
           10         10               12 01-JUN-24
 
 10 rows selected.
+---------------------------------------------------------------------------------------------------------
+Q20. Identify orders where payment_method is NULL.--->
 
 SQL> SELECT *
   2  FROM payments
@@ -93,6 +109,8 @@ SQL> SELECT *
 PAYMENT_ID   ORDER_ID     AMOUNT PAYMENT_METHOD                                     PAYMENT_D
 ---------- ---------- ---------- -------------------------------------------------- ---------
          8          9       2700                                                    06-MAY-24
+----------------------------------------------------------------------------------------------------------
+Q21. Using a CTE, compute total stock value for every product.--->
 
 SQL> WITH stock_value AS
   2  (
@@ -118,6 +136,8 @@ PRODUCT_ID TOTAL_STOCK_VALUE
         10             24000
 
 10 rows selected.
+----------------------------------------------------------------------------------------
+Q22. Build a CTE to calculate monthly sales and find above-average months.--->
 
 SQL> WITH monthly_sales AS
   2  (
@@ -142,24 +162,8 @@ SQL> WITH monthly_sales AS
          2       82900
          5       92700
          7       76700
-
-SQL> WITH dates(dt) AS
-  2  (
-  3  SELECT DATE '2024-01-01'
-  4  FROM dual
-  5  UNION ALL
-  6  SELECT dt+1
-  7  FROM dates
-  8  WHERE dt<DATE '2024-12-31'
-  9  )
- 10  SELECT d.dt,o.order_id
- 11  FROM dates d,orders o
- 12  WHERE d.dt=o.order_date(+);
-WITH dates(dt) AS
-          *
-ERROR at line 1:
-ORA-32033: unsupported column aliasing
-
+--------------------------------------------------------------------------------------------------
+Q23. Generate calendar dates using recursive CTE and join with orders.--->
 
 SQL> SELECT d.dt,o.order_id
   2  FROM
@@ -542,6 +546,8 @@ DT          ORDER_ID
 23-MAR-24
 
 365 rows selected.
+----------------------------------------------------------------------------------------------------
+Q24. Categorize products into price tiers using CTE.--->
 
 SQL> WITH price_tier AS
   2  (
@@ -570,5 +576,6 @@ PRODUCT_ID TIER
         10 HIGH
 
 10 rows selected.
+-------------------------------------------------------------------------------------
 
 SQL> spool off
