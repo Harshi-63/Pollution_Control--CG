@@ -1,0 +1,332 @@
+SQL> SELECT customer_id,
+  2  order_date,
+  3  order_date-LAG(order_date)
+  4  OVER(PARTITION BY customer_id ORDER BY order_date)
+  5  FROM orders;
+
+CUSTOMER_ID ORDER_DAT ORDER_DATE-LAG(ORDER_DATE)OVER(PARTITIONBYCUSTOMER_IDORDERBYORDER_DATE)
+----------- --------- -----------------------------------------------------------------------
+          1 05-JAN-24
+          1 22-MAR-24                                                                      77
+          2 18-JAN-24
+          2 20-MAY-24                                                                     123
+          3 02-FEB-24
+          3 07-JUL-24                                                                     156
+          4 14-FEB-24
+          5 10-MAR-24
+          6 01-APR-24
+          7 15-APR-24
+          8 05-MAY-24
+          9 03-JUN-24
+         10 18-JUN-24
+         11 25-JUL-24
+         12 10-AUG-24
+
+15 rows selected.
+
+SQL> SELECT *
+  2  FROM
+  3  (
+  4  SELECT EXTRACT(MONTH FROM o.order_date) month,
+  5  oi.product_id,
+  6  SUM(oi.quantity) qty,
+  7  RANK() OVER
+  8  (PARTITION BY EXTRACT(MONTH FROM o.order_date)
+  9  ORDER BY SUM(oi.quantity) DESC) r
+ 10  FROM orders o,order_items oi
+ 11  WHERE o.order_id=oi.order_id
+ 12  GROUP BY EXTRACT(MONTH FROM o.order_date),oi.product_id
+ 13  )
+ 14  WHERE r=1;
+
+     MONTH PRODUCT_ID        QTY          R
+---------- ---------- ---------- ----------
+         1          2          3          1
+         1          3          3          1
+         2          7          3          1
+         3          8          2          1
+         3         10          2          1
+         4          5          2          1
+         4          7          2          1
+         5          2          3          1
+         6          9          2          1
+         7          1          1          1
+         7          2          1          1
+         7          3          1          1
+
+12 rows selected.
+
+SQL> SELECT product_id,
+  2  order_id,
+  3  AVG(quantity)
+  4  OVER
+  5  (
+  6  PARTITION BY product_id
+  7  ORDER BY order_id
+  8  ROWS BETWEEN 2 PRECEDING AND CURRENT ROW
+  9  )
+ 10  FROM order_items;
+
+PRODUCT_ID   ORDER_ID AVG(QUANTITY)OVER(PARTITIONBYPRODUCT_IDORDERBYORDER_IDROWSBETWEEN2PRECEDINGANDCURRENTROW)
+---------- ---------- -----------------------------------------------------------------------------------------
+         1          1                                                                                         1
+         1          4                                                                                         1
+         1         10                                                                                         1
+         1         13                                                                                         1
+         2          1                                                                                         2
+         2          2                                                                                       1.5
+         2          6                                                                                1.33333333
+         2          9                                                                                1.66666667
+         2         13                                                                                1.66666667
+         3          1                                                                                         1
+         3          2                                                                                       1.5
+         3          6                                                                                1.33333333
+         3          9                                                                                1.33333333
+         3         13                                                                                         1
+         4          1                                                                                         1
+         4          7                                                                                         1
+         4         10                                                                                         1
+         5          3                                                                                         1
+         5          7                                                                                       1.5
+         5         12                                                                                1.33333333
+         6          3                                                                                         1
+         6          8                                                                                         1
+         7          3                                                                                         3
+         7          8                                                                                       2.5
+         8          5                                                                                         2
+         8          8                                                                                       1.5
+         9          5                                                                                         1
+         9         11                                                                                       1.5
+        10          6                                                                                         2
+        10         11                                                                                       1.5
+
+30 rows selected.
+
+SQL> SELECT customer_id
+  2  FROM
+  3  (
+  4  SELECT customer_id,
+  5  order_date,
+  6  LEAD(order_date)
+  7  OVER(PARTITION BY customer_id ORDER BY order_date) next_order
+  8  FROM orders
+  9  )
+ 10  WHERE next_order-order_date>60;
+
+CUSTOMER_ID
+-----------
+          1
+          2
+          3
+
+SQL> SELECT oi.order_id,
+  2  oi.product_id,
+  3  (oi.quantity*p.price)/
+  4  SUM(oi.quantity*p.price)
+  5  OVER(PARTITION BY oi.order_id)*100
+  6  FROM order_items oi,products p
+  7  WHERE oi.product_id=p.product_id;
+
+  ORDER_ID PRODUCT_ID (OI.QUANTITY*P.PRICE)/SUM(OI.QUANTITY*P.PRICE)OVER(PARTITIONBYOI.ORDER_ID)*100
+---------- ---------- ------------------------------------------------------------------------------
+         1          2                                                                      1.0845987
+         1          3                                                                     1.30151844
+         1          4                                                                     16.2689805
+         1          1                                                                     81.3449024
+         2          2                                                                     17.2413793
+         2          3                                                                     82.7586207
+         3          5                                                                     37.9746835
+         3          7                                                                     30.3797468
+         3          6                                                                     31.6455696
+         4          1                                                                            100
+         5          9                                                                     11.1111111
+         5          8                                                                     88.8888889
+         6          3                                                                     21.0526316
+         6          2                                                                     8.77192982
+         6         10                                                                     70.1754386
+         7          4                                                                     71.4285714
+         7          5                                                                     28.5714286
+         8          7                                                                     15.8415842
+         8          6                                                                     24.7524752
+         8          8                                                                     59.4059406
+         9          3                                                                     44.4444444
+         9          2                                                                     55.5555556
+        10          1                                                                     83.3333333
+        10          4                                                                     16.6666667
+        11         10                                                                             40
+        11          9                                                                             60
+        12          5                                                                            100
+        13          3                                                                     1.56453716
+        13          2                                                                     .651890482
+        13          1                                                                     97.7835724
+
+30 rows selected.
+
+SQL> SELECT product_id,
+  2  SUM(quantity),
+  3  DENSE_RANK() OVER(ORDER BY SUM(quantity) DESC)
+  4  FROM order_items
+  5  GROUP BY product_id;
+
+PRODUCT_ID SUM(QUANTITY) DENSE_RANK()OVER(ORDERBYSUM(QUANTITY)DESC)
+---------- ------------- ------------------------------------------
+         2             8                                          1
+         3             6                                          2
+         7             5                                          3
+         1             4                                          4
+         5             4                                          4
+         8             3                                          5
+         4             3                                          5
+         9             3                                          5
+        10             3                                          5
+         6             2                                          6
+
+10 rows selected.
+
+SQL> SELECT order_id,
+  2  payment_date,
+  3  SUM(amount)
+  4  OVER(PARTITION BY order_id ORDER BY payment_date)
+  5  FROM payments;
+
+  ORDER_ID PAYMENT_D SUM(AMOUNT)OVER(PARTITIONBYORDER_IDORDERBYPAYMENT_DATE)
+---------- --------- -------------------------------------------------------
+         1 06-JAN-24                                                   91700
+         2 19-JAN-24                                                    2900
+         3 06-FEB-24                                                    6800
+         4 15-FEB-24                                                   75000
+         6 23-MAR-24                                                    4900
+         7 02-APR-24                                                   21000
+         8 16-APR-24                                                    9800
+         9 06-MAY-24                                                    2700
+        10 21-MAY-24                                                   90000
+        12 19-JUN-24                                                    3000
+        13 08-JUL-24                                                   77700
+        15 11-AUG-24                                                    8000
+
+12 rows selected.
+
+SQL> SELECT *
+  2  FROM
+  3  (
+  4  SELECT o.customer_id,
+  5  oi.product_id,
+  6  SUM(oi.quantity) qty,
+  7  RANK() OVER
+  8  (PARTITION BY o.customer_id
+  9  ORDER BY SUM(oi.quantity) DESC) r
+ 10  FROM orders o,order_items oi
+ 11  WHERE o.order_id=oi.order_id
+ 12  GROUP BY o.customer_id,oi.product_id
+ 13  )
+ 14  WHERE r=2;
+
+CUSTOMER_ID PRODUCT_ID        QTY          R
+----------- ---------- ---------- ----------
+          1         10          2          2
+          1          3          2          2
+          2          1          1          2
+          2          4          1          2
+          2          2          1          2
+          3          6          1          2
+          3          5          1          2
+          3          2          1          2
+          3          3          1          2
+          3          1          1          2
+          5          9          1          2
+          6          4          1          2
+          7          8          1          2
+          7          6          1          2
+          8          3          1          2
+          9         10          1          2
+
+16 rows selected.
+
+SQL> SELECT oi.product_id,
+  2  o.customer_id,
+  3  SUM(oi.quantity),
+  4  RANK() OVER
+  5  (PARTITION BY oi.product_id
+  6  ORDER BY SUM(oi.quantity) DESC)
+  7  FROM orders o,order_items oi
+  8  WHERE o.order_id=oi.order_id
+  9  GROUP BY oi.product_id,o.customer_id;
+
+PRODUCT_ID CUSTOMER_ID SUM(OI.QUANTITY) RANK()OVER(PARTITIONBYOI.PRODUCT_IDORDERBYSUM(OI.QUANTITY)DESC)
+---------- ----------- ---------------- ---------------------------------------------------------------
+         1           1                1                                                               1
+         1           3                1                                                               1
+         1           2                1                                                               1
+         1           4                1                                                               1
+         2           8                3                                                               1
+         2           1                3                                                               1
+         2           2                1                                                               3
+         2           3                1                                                               3
+         3           2                2                                                               1
+         3           1                2                                                               1
+         3           8                1                                                               3
+         3           3                1                                                               3
+         4           1                1                                                               1
+         4           6                1                                                               1
+         4           2                1                                                               1
+         5           6                2                                                               1
+         5          10                1                                                               2
+         5           3                1                                                               2
+         6           3                1                                                               1
+         6           7                1                                                               1
+         7           3                3                                                               1
+         7           7                2                                                               2
+         8           5                2                                                               1
+         8           7                1                                                               2
+         9           9                2                                                               1
+         9           5                1                                                               2
+        10           1                2                                                               1
+        10           9                1                                                               2
+
+28 rows selected.
+
+SQL> SELECT *
+  2  FROM
+  3  (
+  4  SELECT order_id,
+  5  SUM(quantity*price) order_value,
+  6  PERCENT_RANK() OVER(ORDER BY SUM(quantity*price)) pr
+  7  FROM order_items oi,products p
+  8  WHERE oi.product_id=p.product_id
+  9  GROUP BY order_id
+ 10  )
+ 11  WHERE pr>=0.9;
+
+  ORDER_ID ORDER_VALUE         PR
+---------- ----------- ----------
+        10       90000 .916666667
+         1       92200          1
+
+SQL> SELECT customer_id,
+  2  NTILE(4) OVER(ORDER BY total_spent)
+  3  FROM
+  4  (
+  5  SELECT o.customer_id,
+  6  SUM(oi.quantity*p.price) total_spent
+  7  FROM orders o,order_items oi,products p
+  8  WHERE o.order_id=oi.order_id
+  9  AND oi.product_id=p.product_id
+ 10  GROUP BY o.customer_id
+ 11  );
+
+CUSTOMER_ID NTILE(4)OVER(ORDERBYTOTAL_SPENT)
+----------- --------------------------------
+          8                                1
+         10                                1
+          9                                1
+          7                                2
+          5                                2
+          6                                2
+          4                                3
+          3                                3
+          2                                4
+          1                                4
+
+10 rows selected.
+
+SQL> spool off

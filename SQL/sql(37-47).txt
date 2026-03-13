@@ -1,0 +1,301 @@
+SQL> SELECT customer_id,
+  2  NTILE(4) OVER(ORDER BY total_spent)
+  3  FROM
+  4  (
+  5  SELECT o.customer_id,
+  6  SUM(oi.quantity*p.price) total_spent
+  7  FROM orders o,order_items oi,products p
+  8  WHERE o.order_id=oi.order_id
+  9  AND oi.product_id=p.product_id
+ 10  GROUP BY o.customer_id
+ 11  );
+
+CUSTOMER_ID NTILE(4)OVER(ORDERBYTOTAL_SPENT)
+----------- --------------------------------
+          8                                1
+         10                                1
+          9                                1
+          7                                2
+          5                                2
+          6                                2
+          4                                3
+          3                                3
+          2                                4
+          1                                4
+
+10 rows selected.
+
+SQL> SELECT order_id,
+  2  CASE
+  3  WHEN SUM(quantity)<=2 THEN 'SMALL'
+  4  WHEN SUM(quantity)<=5 THEN 'MEDIUM'
+  5  ELSE 'LARGE'
+  6  END
+  7  FROM order_items
+  8  GROUP BY order_id;
+
+  ORDER_ID CASEWH
+---------- ------
+         1 MEDIUM
+         6 MEDIUM
+        11 MEDIUM
+        13 MEDIUM
+         2 MEDIUM
+         4 SMALL
+         5 MEDIUM
+         8 MEDIUM
+         3 MEDIUM
+         7 MEDIUM
+         9 MEDIUM
+        10 SMALL
+        12 SMALL
+
+13 rows selected.
+
+SQL> SELECT payment_id,
+  2  CASE
+  3  WHEN amount<100 THEN 'LOW'
+  4  WHEN amount<500 THEN 'MEDIUM'
+  5  ELSE 'HIGH'
+  6  END
+  7  FROM payments;
+
+PAYMENT_ID CASEWH
+---------- ------
+         1 HIGH
+         2 HIGH
+         3 HIGH
+         4 HIGH
+         5 HIGH
+         6 HIGH
+         7 HIGH
+         8 HIGH
+         9 HIGH
+        10 HIGH
+        11 HIGH
+        12 HIGH
+
+12 rows selected.
+
+SQL> SELECT inventory_id,
+  2  CASE
+  3  WHEN SYSDATE-last_updated<30 THEN 'NEW'
+  4  WHEN SYSDATE-last_updated<90 THEN 'MEDIUM'
+  5  ELSE 'OLD'
+  6  END
+  7  FROM inventory;
+
+INVENTORY_ID CASEWH
+------------ ------
+           1 OLD
+           2 OLD
+           3 OLD
+           4 OLD
+           5 OLD
+           6 OLD
+           7 OLD
+           8 OLD
+           9 OLD
+          10 OLD
+
+10 rows selected.
+
+SQL> SELECT TRUNC(o.order_date,'IW') week_start,
+  2  SUM(oi.quantity*p.price)
+  3  FROM orders o,order_items oi,products p
+  4  WHERE o.order_id=oi.order_id
+  5  AND oi.product_id=p.product_id
+  6  GROUP BY TRUNC(o.order_date,'IW');
+
+WEEK_STAR SUM(OI.QUANTITY*P.PRICE)
+--------- ------------------------
+12-FEB-24                    75000
+20-MAY-24                    90000
+03-JUN-24                     5000
+01-JAN-24                    92200
+15-JAN-24                     2900
+29-JAN-24                     7900
+29-APR-24                     2700
+01-APR-24                    21000
+15-APR-24                    10100
+17-JUN-24                     3000
+01-JUL-24                    76700
+18-MAR-24                     5700
+04-MAR-24                    13500
+
+13 rows selected.
+
+SQL> SELECT customer_id,
+  2  NTILE(4) OVER(ORDER BY order_value)
+  3  FROM
+  4  (
+  5  SELECT o.customer_id,
+  6  SUM(oi.quantity*p.price) order_value
+  7  FROM orders o,order_items oi,products p
+  8  WHERE o.order_id=oi.order_id
+  9  AND oi.product_id=p.product_id
+ 10  GROUP BY o.customer_id
+ 11  );
+
+CUSTOMER_ID NTILE(4)OVER(ORDERBYORDER_VALUE)
+----------- --------------------------------
+          8                                1
+         10                                1
+          9                                1
+          7                                2
+          5                                2
+          6                                2
+          4                                3
+          3                                3
+          2                                4
+          1                                4
+
+10 rows selected.
+
+SQL> SELECT product_id,
+  2  COUNT(*)
+  3  FROM order_items
+  4  GROUP BY product_id;
+
+PRODUCT_ID   COUNT(*)
+---------- ----------
+         1          4
+         6          2
+         2          5
+         4          3
+         5          3
+         8          2
+         3          5
+         7          2
+         9          2
+        10          2
+
+10 rows selected.
+
+SQL> SELECT customer_id,
+  2  AVG(order_date-prev_order)
+  3  FROM
+  4  (
+  5  SELECT customer_id,
+  6  order_date,
+  7  LAG(order_date) OVER(PARTITION BY customer_id ORDER BY order_date) prev_order
+  8  FROM orders
+  9  )
+ 10  GROUP BY customer_id;
+
+CUSTOMER_ID AVG(ORDER_DATE-PREV_ORDER)
+----------- --------------------------
+          1                         77
+          2                        123
+          3                        156
+          4
+          5
+          6
+          7
+          8
+          9
+         10
+         11
+         12
+
+12 rows selected.
+
+SQL> SELECT *
+  2  FROM
+  3  (
+  4  SELECT c.email,
+  5  o.customer_id,
+  6  SUM(oi.quantity*p.price) total_spent,
+  7  RANK() OVER
+  8  (PARTITION BY SUBSTR(c.email,INSTR(c.email,'@')+1)
+  9  ORDER BY SUM(oi.quantity*p.price) DESC) r
+ 10  FROM customers c,orders o,order_items oi,products p
+ 11  WHERE c.customer_id=o.customer_id
+ 12  AND o.order_id=oi.order_id
+ 13  AND oi.product_id=p.product_id
+ 14  GROUP BY c.email,o.customer_id
+ 15  )
+ 16  WHERE r<=5;
+
+EMAIL                                                                                                CUSTOMER_ID TOTAL_SPENT          R
+---------------------------------------------------------------------------------------------------- ----------- ----------- ----------
+alice@gmail.com                                                                                                1       97900          1
+carol@gmail.com                                                                                                3       84600          2
+eva@gmail.com                                                                                                  5       13500          3
+henry@gmail.com                                                                                                8        2700          4
+david@outlook.com                                                                                              4       75000          1
+grace@outlook.com                                                                                              7       10100          2
+jack@outlook.com                                                                                              10        3000          3
+bob@yahoo.com                                                                                                  2       92900          1
+frank@yahoo.com                                                                                                6       21000          2
+iris@yahoo.com                                                                                                 9        5000          3
+
+10 rows selected.
+
+SQL> SELECT o.customer_id,
+  2  o.order_date,
+  3  SUM(oi.quantity*p.price)
+  4  OVER(PARTITION BY o.customer_id ORDER BY o.order_date)
+  5  FROM orders o,order_items oi,products p
+  6  WHERE o.order_id=oi.order_id
+  7  AND oi.product_id=p.product_id;
+
+CUSTOMER_ID ORDER_DAT SUM(OI.QUANTITY*P.PRICE)OVER(PARTITIONBYO.CUSTOMER_IDORDERBYO.ORDER_DATE)
+----------- --------- -------------------------------------------------------------------------
+          1 05-JAN-24                                                                     92200
+          1 05-JAN-24                                                                     92200
+          1 05-JAN-24                                                                     92200
+          1 05-JAN-24                                                                     92200
+          1 22-MAR-24                                                                     97900
+          1 22-MAR-24                                                                     97900
+          1 22-MAR-24                                                                     97900
+          2 18-JAN-24                                                                      2900
+          2 18-JAN-24                                                                      2900
+          2 20-MAY-24                                                                     92900
+          2 20-MAY-24                                                                     92900
+          3 02-FEB-24                                                                      7900
+          3 02-FEB-24                                                                      7900
+          3 02-FEB-24                                                                      7900
+          3 07-JUL-24                                                                     84600
+          3 07-JUL-24                                                                     84600
+          3 07-JUL-24                                                                     84600
+          4 14-FEB-24                                                                     75000
+          5 10-MAR-24                                                                     13500
+          5 10-MAR-24                                                                     13500
+          6 01-APR-24                                                                     21000
+          6 01-APR-24                                                                     21000
+          7 15-APR-24                                                                     10100
+          7 15-APR-24                                                                     10100
+          7 15-APR-24                                                                     10100
+          8 05-MAY-24                                                                      2700
+          8 05-MAY-24                                                                      2700
+          9 03-JUN-24                                                                      5000
+          9 03-JUN-24                                                                      5000
+         10 18-JUN-24                                                                      3000
+
+30 rows selected.
+
+SQL> SELECT customer_id,
+  2  MIN(order_date),
+  3  MAX(order_date)
+  4  FROM orders
+  5  GROUP BY customer_id;
+
+CUSTOMER_ID MIN(ORDER MAX(ORDER
+----------- --------- ---------
+          1 05-JAN-24 22-MAR-24
+          6 01-APR-24 01-APR-24
+         11 25-JUL-24 25-JUL-24
+          2 18-JAN-24 20-MAY-24
+          4 14-FEB-24 14-FEB-24
+          5 10-MAR-24 10-MAR-24
+          8 05-MAY-24 05-MAY-24
+          3 02-FEB-24 07-JUL-24
+          7 15-APR-24 15-APR-24
+          9 03-JUN-24 03-JUN-24
+         10 18-JUN-24 18-JUN-24
+         12 10-AUG-24 10-AUG-24
+
+12 rows selected.
+
+SQL> spool off
