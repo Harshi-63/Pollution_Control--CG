@@ -1,0 +1,1024 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pollution Controls — Dataset Canvas</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        /* ── Reset & Base ──────────────────────────────────────── */
+        *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+        :root {
+            --bg: #0f1117;
+            --bg-card: #181b24;
+            --bg-card-hover: #1e2230;
+            --border: #2a2e3a;
+            --border-glow: #3b82f6;
+            --text: #e4e7ed;
+            --text-dim: #8b91a0;
+            --text-muted: #5a5f6e;
+            --accent-blue: #3b82f6;
+            --accent-purple: #8b5cf6;
+            --accent-green: #10b981;
+            --accent-orange: #f59e0b;
+            --accent-red: #ef4444;
+            --accent-pink: #ec4899;
+            --font: 'Inter', -apple-system, sans-serif;
+            --mono: 'JetBrains Mono', monospace;
+            --radius: 12px;
+            --shadow: 0 4px 24px rgba(0,0,0,0.4);
+        }
+
+        body {
+            font-family: var(--font);
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* ── Two-Column Page Layout ─────────────────────────────── */
+        .page-layout {
+            display: flex;
+            position: relative;
+            z-index: 1;
+        }
+
+        .page-main {
+            flex: 1;
+            min-width: 0;
+        }
+
+        /* ── Rules Panel ───────────────────────────────────────── */
+        .rules-panel {
+            width: 360px;
+            flex-shrink: 0;
+            position: sticky;
+            top: 0;
+            height: 100vh;
+            overflow-y: auto;
+            border-left: 1px solid var(--border);
+            background: rgba(15,17,23,0.95);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            z-index: 2;
+        }
+
+        .rules-panel::-webkit-scrollbar { width: 4px; }
+        .rules-panel::-webkit-scrollbar-track { background: transparent; }
+        .rules-panel::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+
+        .rules-panel-header {
+            position: sticky;
+            top: 0;
+            z-index: 3;
+            background: rgba(15,17,23,0.97);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            padding: 24px 20px 16px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .rules-panel-header h2 {
+            font-size: 0.9rem;
+            font-weight: 600;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            background: linear-gradient(135deg, var(--accent-purple), var(--accent-blue));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .rules-panel-header p {
+            font-size: 0.72rem;
+            color: var(--text-muted);
+            margin-top: 4px;
+        }
+
+        .rules-list {
+            padding: 12px 16px 32px;
+        }
+
+        .rule-item {
+            padding: 14px 16px;
+            border-radius: 8px;
+            margin-bottom: 6px;
+            border: 1px solid transparent;
+            transition: background 0.2s, border-color 0.2s;
+            cursor: default;
+        }
+
+        .rule-item:hover {
+            background: var(--bg-card-hover);
+            border-color: var(--border);
+        }
+
+        .rule-item-header {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 6px;
+        }
+
+        .rule-num {
+            font-family: var(--mono);
+            font-size: 0.68rem;
+            font-weight: 600;
+            padding: 2px 8px;
+            border-radius: 4px;
+            background: rgba(139,92,246,0.15);
+            color: var(--accent-purple);
+            flex-shrink: 0;
+        }
+
+        .rule-name {
+            font-size: 0.8rem;
+            font-weight: 500;
+            color: var(--text);
+        }
+
+        .rule-desc {
+            font-size: 0.74rem;
+            color: var(--text-dim);
+            line-height: 1.55;
+        }
+
+        .rule-meta {
+            display: flex;
+            gap: 6px;
+            flex-wrap: wrap;
+            margin-top: 8px;
+        }
+
+        .rule-meta-tag {
+            font-size: 0.62rem;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-family: var(--mono);
+        }
+
+        .meta-dataset { background: rgba(59,130,246,0.1); color: var(--accent-blue); }
+        .meta-col { background: rgba(16,185,129,0.1); color: var(--accent-green); }
+        .meta-type { background: rgba(245,158,11,0.1); color: var(--accent-orange); }
+
+        /* ── Canvas Background ─────────────────────────────────── */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background:
+                radial-gradient(circle at 20% 20%, rgba(59,130,246,0.05) 0%, transparent 50%),
+                radial-gradient(circle at 80% 80%, rgba(139,92,246,0.05) 0%, transparent 50%),
+                radial-gradient(circle at 50% 50%, rgba(16,185,129,0.03) 0%, transparent 60%);
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        /* dot grid */
+        body::after {
+            content: '';
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background-image: radial-gradient(circle, rgba(255,255,255,0.03) 1px, transparent 1px);
+            background-size: 32px 32px;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        /* ── Header ────────────────────────────────────────────── */
+        header {
+            position: relative;
+            z-index: 1;
+            text-align: center;
+            padding: 48px 24px 16px;
+        }
+
+        header h1 {
+            font-size: 2rem;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+            background: linear-gradient(135deg, var(--accent-blue), var(--accent-purple));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        header p {
+            color: var(--text-dim);
+            font-size: 0.95rem;
+            margin-top: 8px;
+            font-weight: 300;
+        }
+
+        .stats-bar {
+            display: flex;
+            justify-content: center;
+            gap: 32px;
+            margin-top: 20px;
+            flex-wrap: wrap;
+        }
+
+        .stat {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.82rem;
+            color: var(--text-dim);
+        }
+
+        .stat-dot {
+            width: 8px; height: 8px;
+            border-radius: 50%;
+            flex-shrink: 0;
+        }
+
+        .stat strong {
+            color: var(--text);
+            font-weight: 600;
+        }
+
+        /* ── SVG Relationship Lines ────────────────────────────── */
+        #relationship-svg {
+            position: absolute;
+            top: 0; left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        #relationship-svg line {
+            stroke: var(--border);
+            stroke-width: 1.5;
+            stroke-dasharray: 6 4;
+            opacity: 0.3;
+            transition: opacity 0.3s, stroke 0.3s;
+        }
+
+        #relationship-svg line.active {
+            opacity: 0.7;
+            stroke: var(--accent-blue);
+            stroke-dasharray: none;
+            stroke-width: 2;
+        }
+
+        /* ── Canvas Layout ─────────────────────────────────────── */
+        .canvas {
+            position: relative;
+            z-index: 1;
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 24px 32px 64px;
+        }
+
+        /* central raw_cems */
+        .central-card-wrapper {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 48px;
+        }
+
+        /* 4 reference tables */
+        .reference-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 24px;
+        }
+
+        /* ── Dataset Card ──────────────────────────────────────── */
+        .dataset-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            overflow: visible;
+            box-shadow: var(--shadow);
+            transition: border-color 0.3s, box-shadow 0.3s, transform 0.2s;
+        }
+
+        .dataset-card:hover {
+            border-color: rgba(59,130,246,0.3);
+            box-shadow: 0 8px 40px rgba(0,0,0,0.5), 0 0 0 1px rgba(59,130,246,0.15);
+            transform: translateY(-2px);
+        }
+
+        .dataset-card.central {
+            max-width: 900px;
+            width: 100%;
+            border-color: rgba(59,130,246,0.2);
+        }
+
+        .card-header {
+            padding: 20px 24px 16px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .card-title-area {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .card-title {
+            font-family: var(--mono);
+            font-size: 0.95rem;
+            font-weight: 500;
+            color: var(--text);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .card-title .icon {
+            font-size: 1.1rem;
+        }
+
+        .card-subtitle {
+            font-size: 0.78rem;
+            color: var(--text-dim);
+            margin-top: 4px;
+            line-height: 1.4;
+        }
+
+        .card-badge {
+            font-size: 0.68rem;
+            font-weight: 600;
+            padding: 4px 10px;
+            border-radius: 20px;
+            white-space: nowrap;
+            align-self: flex-start;
+            letter-spacing: 0.5px;
+        }
+
+        .badge-core { background: rgba(59,130,246,0.15); color: var(--accent-blue); }
+        .badge-ref { background: rgba(16,185,129,0.15); color: var(--accent-green); }
+        .badge-log { background: rgba(245,158,11,0.15); color: var(--accent-orange); }
+        .badge-manual { background: rgba(236,72,153,0.15); color: var(--accent-pink); }
+        .badge-legal { background: rgba(239,68,68,0.15); color: var(--accent-red); }
+
+        .row-count {
+            font-size: 0.72rem;
+            color: var(--text-muted);
+            margin-top: 6px;
+            font-family: var(--mono);
+        }
+
+        /* ── Column Table ──────────────────────────────────────── */
+        .col-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .col-table th {
+            font-size: 0.65rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--text-muted);
+            padding: 10px 16px;
+            text-align: left;
+            border-bottom: 1px solid var(--border);
+            background: rgba(0,0,0,0.15);
+        }
+
+        .col-row {
+            cursor: pointer;
+            transition: background 0.15s;
+            position: relative;
+        }
+
+        .col-row:hover {
+            background: var(--bg-card-hover);
+        }
+
+        .col-row td {
+            padding: 10px 16px;
+            font-size: 0.82rem;
+            border-bottom: 1px solid rgba(42,46,58,0.5);
+            vertical-align: top;
+        }
+
+        .col-row:last-child td {
+            border-bottom: none;
+        }
+
+        .col-name {
+            font-family: var(--mono);
+            font-weight: 500;
+            color: var(--text);
+            white-space: nowrap;
+        }
+
+        .col-type {
+            font-family: var(--mono);
+            font-size: 0.72rem;
+            color: var(--text-muted);
+        }
+
+        .col-sample {
+            font-family: var(--mono);
+            font-size: 0.75rem;
+            color: var(--text-dim);
+            max-width: 180px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .rule-tags {
+            display: flex;
+            gap: 4px;
+            flex-wrap: wrap;
+        }
+
+        .rule-tag {
+            font-size: 0.62rem;
+            font-weight: 600;
+            padding: 2px 7px;
+            border-radius: 4px;
+            background: rgba(139,92,246,0.15);
+            color: var(--accent-purple);
+            font-family: var(--mono);
+            white-space: nowrap;
+        }
+
+        /* ── Tooltip ───────────────────────────────────────────── */
+        .tooltip {
+            display: none;
+            position: fixed;
+            z-index: 100;
+            max-width: 380px;
+            background: #1c2030;
+            border: 1px solid rgba(59,130,246,0.3);
+            border-radius: 10px;
+            padding: 16px 20px;
+            box-shadow: 0 16px 48px rgba(0,0,0,0.6), 0 0 0 1px rgba(59,130,246,0.1);
+            pointer-events: none;
+            animation: tooltipIn 0.15s ease-out;
+        }
+
+        @keyframes tooltipIn {
+            from { opacity: 0; transform: translateY(4px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .tooltip.active { display: block; }
+
+        .tooltip-title {
+            font-family: var(--mono);
+            font-weight: 600;
+            font-size: 0.88rem;
+            color: var(--accent-blue);
+            margin-bottom: 8px;
+        }
+
+        .tooltip-desc {
+            font-size: 0.8rem;
+            color: var(--text-dim);
+            line-height: 1.5;
+            margin-bottom: 10px;
+        }
+
+        .tooltip-section {
+            margin-bottom: 8px;
+        }
+
+        .tooltip-label {
+            font-size: 0.68rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+            color: var(--text-muted);
+            margin-bottom: 4px;
+        }
+
+        .tooltip-value {
+            font-size: 0.78rem;
+            color: var(--text);
+            line-height: 1.5;
+        }
+
+        .tooltip-messy {
+            margin-top: 6px;
+            padding: 8px 12px;
+            background: rgba(245,158,11,0.08);
+            border: 1px solid rgba(245,158,11,0.15);
+            border-radius: 6px;
+            font-size: 0.75rem;
+            color: var(--accent-orange);
+            line-height: 1.5;
+        }
+
+        .tooltip-messy strong {
+            color: var(--accent-orange);
+        }
+
+        /* ── Relationship Label ────────────────────────────────── */
+        .rel-label {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            font-size: 0.68rem;
+            color: var(--text-muted);
+            padding: 8px 16px;
+            font-style: italic;
+        }
+
+        .rel-label .arrow {
+            color: var(--accent-blue);
+            font-size: 0.8rem;
+        }
+
+        /* section titles */
+        .section-title {
+            text-align: center;
+            font-size: 0.78rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: var(--text-muted);
+            margin-bottom: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+        }
+
+        .section-title::before,
+        .section-title::after {
+            content: '';
+            flex: 1;
+            max-width: 100px;
+            height: 1px;
+            background: var(--border);
+        }
+
+        /* ── Legend ─────────────────────────────────────────────── */
+        .legend {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            padding: 24px 0 0;
+            flex-wrap: wrap;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 0.72rem;
+            color: var(--text-dim);
+        }
+
+        .legend-dot {
+            width: 6px; height: 6px;
+            border-radius: 50%;
+        }
+
+        /* ── Responsive ────────────────────────────────────────── */
+        @media (max-width: 1200px) {
+            .page-layout { flex-direction: column; }
+            .rules-panel {
+                width: 100%;
+                height: auto;
+                position: relative;
+                border-left: none;
+                border-top: 1px solid var(--border);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .canvas { padding: 16px; }
+            header h1 { font-size: 1.5rem; }
+            .stats-bar { gap: 16px; }
+            .reference-grid { grid-template-columns: 1fr; }
+            .card-header { flex-direction: column; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="page-layout">
+<div class="page-main">
+
+<header>
+    <h1>Pollution Controls — Dataset Canvas</h1>
+    <p>5 interconnected datasets powering 20 data cleaning rules for CEMS compliance</p>
+    <div class="stats-bar">
+        <div class="stat">
+            <div class="stat-dot" style="background: var(--accent-blue)"></div>
+            <span><strong>5</strong> Datasets</span>
+        </div>
+        <div class="stat">
+            <div class="stat-dot" style="background: var(--accent-purple)"></div>
+            <span><strong>20</strong> Cleaning Rules</span>
+        </div>
+        <div class="stat">
+            <div class="stat-dot" style="background: var(--accent-green)"></div>
+            <span><strong>10</strong> Sensors</span>
+        </div>
+        <div class="stat">
+            <div class="stat-dot" style="background: var(--accent-orange)"></div>
+            <span><strong>28,800</strong> Rows/Month</span>
+        </div>
+    </div>
+</header>
+
+<div class="canvas">
+    <!-- ═══ CORE DATASET ═══ -->
+    <div class="section-title">Core Input Stream</div>
+    <div class="central-card-wrapper">
+        <div class="dataset-card central" id="card-raw">
+            <div class="card-header">
+                <div class="card-title-area">
+                    <div class="card-title"><span class="icon">📡</span> raw_cems_data.csv</div>
+                    <div class="card-subtitle">The raw, unfiltered 15-minute data stream from all 10 sensors. This is the primary dataset that all cleaning rules operate on.</div>
+                    <div class="row-count">~28,800 rows/month · 10 sensors × 4/hr × 24hrs × 30 days</div>
+                </div>
+                <div class="card-badge badge-core">CORE · DYNAMIC</div>
+            </div>
+            <table class="col-table">
+                <thead>
+                    <tr><th>Column</th><th>Type</th><th>Sample</th><th>Rules</th></tr>
+                </thead>
+                <tbody>
+                    <tr class="col-row" data-col="raw-record_id"><td class="col-name">Record_ID</td><td class="col-type">String</td><td class="col-sample">E00001</td><td></td></tr>
+                    <tr class="col-row" data-col="raw-plant_id"><td class="col-name">Plant_ID</td><td class="col-type">String</td><td class="col-sample">PL-01, LOC-DEL-01</td><td><div class="rule-tags"><span class="rule-tag">R6</span><span class="rule-tag">R13</span></div></td></tr>
+                    <tr class="col-row" data-col="raw-stack_id"><td class="col-name">Stack_ID</td><td class="col-type">String</td><td class="col-sample">S-01, A-01</td><td><div class="rule-tags"><span class="rule-tag">R10</span><span class="rule-tag">R13</span><span class="rule-tag">R15</span></div></td></tr>
+                    <tr class="col-row" data-col="raw-flow_rate"><td class="col-name">Flow_Rate_m3_hr</td><td class="col-type">Float</td><td class="col-sample">3500.0, 0, NULL</td><td></td></tr>
+                    <tr class="col-row" data-col="raw-ts"><td class="col-name">TS</td><td class="col-type">String→Datetime</td><td class="col-sample">14-03-2026 12:15</td><td><div class="rule-tags"><span class="rule-tag">R1</span><span class="rule-tag">R17</span></div></td></tr>
+                    <tr class="col-row" data-col="raw-pm25"><td class="col-name">PM2.5</td><td class="col-type">Mixed</td><td class="col-sample">180.0, -5.0, BDL</td><td><div class="rule-tags"><span class="rule-tag">R5</span><span class="rule-tag">R8</span><span class="rule-tag">R9</span><span class="rule-tag">R11</span></div></td></tr>
+                    <tr class="col-row" data-col="raw-so2"><td class="col-name">SO2</td><td class="col-type">Mixed</td><td class="col-sample">40.0, &lt;4.0, 9999</td><td><div class="rule-tags"><span class="rule-tag">R5</span><span class="rule-tag">R8</span><span class="rule-tag">R9</span><span class="rule-tag">R11</span></div></td></tr>
+                    <tr class="col-row" data-col="raw-nox"><td class="col-name">NOx</td><td class="col-type">Mixed</td><td class="col-sample">90.0, &lt;5.0, 8500</td><td><div class="rule-tags"><span class="rule-tag">R5</span><span class="rule-tag">R8</span><span class="rule-tag">R9</span><span class="rule-tag">R11</span></div></td></tr>
+                    <tr class="col-row" data-col="raw-unit"><td class="col-name">Unit</td><td class="col-type">String</td><td class="col-sample">ug/m3, µg/m³, mg/Nm3</td><td><div class="rule-tags"><span class="rule-tag">R2</span><span class="rule-tag">R14</span></div></td></tr>
+                    <tr class="col-row" data-col="raw-status"><td class="col-name">Status</td><td class="col-type">String</td><td class="col-sample">OK, " ok ", offline</td><td><div class="rule-tags"><span class="rule-tag">R3</span><span class="rule-tag">R12</span></div></td></tr>
+                    <tr class="col-row" data-col="raw-latlon"><td class="col-name">Lat_Lon</td><td class="col-type">String</td><td class="col-sample">13.0827,80.2707</td><td><div class="rule-tags"><span class="rule-tag">R4</span></div></td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- ═══ REFERENCE DATASETS ═══ -->
+    <div class="section-title">Reference &amp; Lookup Tables</div>
+    <div class="reference-grid">
+
+        <!-- sensor_master -->
+        <div class="dataset-card" id="card-sensor">
+            <div class="card-header">
+                <div class="card-title-area">
+                    <div class="card-title"><span class="icon">🔧</span> sensor_master.csv</div>
+                    <div class="card-subtitle">Hardware specs &amp; calibration metadata. The "absolute truth" table for sensor identity and drift correction.</div>
+                    <div class="row-count">10 rows · 1 per physical sensor</div>
+                </div>
+                <div class="card-badge badge-ref">REFERENCE</div>
+            </div>
+            <div class="rel-label"><span class="arrow">↑</span> Joins to raw_cems on <strong style="color:var(--text)">&nbsp;Plant_ID + Stack_ID</strong></div>
+            <table class="col-table">
+                <thead><tr><th>Column</th><th>Type</th><th>Rules</th></tr></thead>
+                <tbody>
+                    <tr class="col-row" data-col="sm-plant_id"><td class="col-name">Plant_ID</td><td class="col-type">String</td><td><div class="rule-tags"><span class="rule-tag">R13</span></div></td></tr>
+                    <tr class="col-row" data-col="sm-stack_id"><td class="col-name">Stack_ID</td><td class="col-type">String</td><td><div class="rule-tags"><span class="rule-tag">R13</span></div></td></tr>
+                    <tr class="col-row" data-col="sm-source_type"><td class="col-name">Source_Type</td><td class="col-type">String</td><td><div class="rule-tags"><span class="rule-tag">R15</span><span class="rule-tag">R19</span></div></td></tr>
+                    <tr class="col-row" data-col="sm-sector"><td class="col-name">Sector</td><td class="col-type">String</td><td></td></tr>
+                    <tr class="col-row" data-col="sm-zero_drift"><td class="col-name">Zero_Drift</td><td class="col-type">Float</td><td><div class="rule-tags"><span class="rule-tag">R7</span></div></td></tr>
+                    <tr class="col-row" data-col="sm-span_mult"><td class="col-name">Span_Mult</td><td class="col-type">Float</td><td><div class="rule-tags"><span class="rule-tag">R7</span></div></td></tr>
+                    <tr class="col-row" data-col="sm-lod_pm25"><td class="col-name">LOD_PM25</td><td class="col-type">Float</td><td><div class="rule-tags"><span class="rule-tag">R11</span></div></td></tr>
+                    <tr class="col-row" data-col="sm-lod_so2"><td class="col-name">LOD_SO2</td><td class="col-type">Float</td><td><div class="rule-tags"><span class="rule-tag">R11</span></div></td></tr>
+                    <tr class="col-row" data-col="sm-lod_nox"><td class="col-name">LOD_NOx</td><td class="col-type">Float</td><td><div class="rule-tags"><span class="rule-tag">R11</span></div></td></tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- maintenance_logs -->
+        <div class="dataset-card" id="card-maint">
+            <div class="card-header">
+                <div class="card-title-area">
+                    <div class="card-title"><span class="icon">🛠️</span> maintenance_logs.csv</div>
+                    <div class="card-subtitle">Mechanic work windows. If a sensor was under maintenance, its data is deleted and status forced to MAINT.</div>
+                    <div class="row-count">~30 rows/month · dynamic</div>
+                </div>
+                <div class="card-badge badge-log">LOG · DYNAMIC</div>
+            </div>
+            <div class="rel-label"><span class="arrow">↑</span> Cross-ref with raw_cems on <strong style="color:var(--text)">&nbsp;Plant_ID + Stack_ID + Time Overlap</strong></div>
+            <table class="col-table">
+                <thead><tr><th>Column</th><th>Type</th><th>Rules</th></tr></thead>
+                <tbody>
+                    <tr class="col-row" data-col="ml-plant_id"><td class="col-name">Plant_ID</td><td class="col-type">String</td><td><div class="rule-tags"><span class="rule-tag">R10</span></div></td></tr>
+                    <tr class="col-row" data-col="ml-stack_id"><td class="col-name">Stack_ID</td><td class="col-type">String</td><td><div class="rule-tags"><span class="rule-tag">R10</span></div></td></tr>
+                    <tr class="col-row" data-col="ml-maint_start"><td class="col-name">Maint_Start</td><td class="col-type">Datetime</td><td><div class="rule-tags"><span class="rule-tag">R10</span></div></td></tr>
+                    <tr class="col-row" data-col="ml-maint_end"><td class="col-name">Maint_End</td><td class="col-type">Datetime</td><td><div class="rule-tags"><span class="rule-tag">R10</span></div></td></tr>
+                    <tr class="col-row" data-col="ml-technician"><td class="col-name">Technician</td><td class="col-type">String</td><td></td></tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- manual_entries -->
+        <div class="dataset-card" id="card-manual">
+            <div class="card-header">
+                <div class="card-title-area">
+                    <div class="card-title"><span class="icon">📋</span> manual_entries.csv</div>
+                    <div class="card-subtitle">Human-typed lab results &amp; inspection notes. Highly prone to typos and privacy leaks (PII).</div>
+                    <div class="row-count">~50 rows/month · dynamic</div>
+                </div>
+                <div class="card-badge badge-manual">MANUAL · DYNAMIC</div>
+            </div>
+            <div class="rel-label"><span class="arrow">↑</span> QC check on <strong style="color:var(--text)">&nbsp;Plant_ID</strong> · validates sensor readings</div>
+            <table class="col-table">
+                <thead><tr><th>Column</th><th>Type</th><th>Rules</th></tr></thead>
+                <tbody>
+                    <tr class="col-row" data-col="me-log_id"><td class="col-name">Log_ID</td><td class="col-type">String</td><td></td></tr>
+                    <tr class="col-row" data-col="me-plant_id"><td class="col-name">Plant_ID</td><td class="col-type">String</td><td><div class="rule-tags"><span class="rule-tag">R16</span></div></td></tr>
+                    <tr class="col-row" data-col="me-entry1"><td class="col-name">Lab_PM25_Entry1</td><td class="col-type">Float</td><td><div class="rule-tags"><span class="rule-tag">R16</span></div></td></tr>
+                    <tr class="col-row" data-col="me-entry2"><td class="col-name">Lab_PM25_Entry2</td><td class="col-type">Float</td><td><div class="rule-tags"><span class="rule-tag">R16</span></div></td></tr>
+                    <tr class="col-row" data-col="me-notes"><td class="col-name">Inspection_Notes</td><td class="col-type">String</td><td><div class="rule-tags"><span class="rule-tag">R18</span></div></td></tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- regulatory_thresholds -->
+        <div class="dataset-card" id="card-reg">
+            <div class="card-header">
+                <div class="card-title-area">
+                    <div class="card-title"><span class="icon">⚖️</span> regulatory_thresholds.csv</div>
+                    <div class="card-subtitle">Government legal limits. Different limits for Ambient (city air) vs Stack (chimney emissions). Used for compliance flagging.</div>
+                    <div class="row-count">6 rows · static legal limits</div>
+                </div>
+                <div class="card-badge badge-legal">LEGAL · STATIC</div>
+            </div>
+            <div class="rel-label"><span class="arrow">↑</span> Joins on <strong style="color:var(--text)">&nbsp;Source_Type + Pollutant</strong> · after Rule 15 tagging</div>
+            <table class="col-table">
+                <thead><tr><th>Column</th><th>Type</th><th>Rules</th></tr></thead>
+                <tbody>
+                    <tr class="col-row" data-col="rt-pollutant"><td class="col-name">Pollutant</td><td class="col-type">String</td><td><div class="rule-tags"><span class="rule-tag">R19</span></div></td></tr>
+                    <tr class="col-row" data-col="rt-source_type"><td class="col-name">Source_Type</td><td class="col-type">String</td><td><div class="rule-tags"><span class="rule-tag">R15</span><span class="rule-tag">R19</span></div></td></tr>
+                    <tr class="col-row" data-col="rt-limit"><td class="col-name">Legal_Limit_ugm3</td><td class="col-type">Float</td><td><div class="rule-tags"><span class="rule-tag">R19</span></div></td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="legend">
+        <div class="legend-item"><div class="legend-dot" style="background:var(--accent-blue)"></div> Core Stream</div>
+        <div class="legend-item"><div class="legend-dot" style="background:var(--accent-green)"></div> Reference Table</div>
+        <div class="legend-item"><div class="legend-dot" style="background:var(--accent-orange)"></div> Dynamic Log</div>
+        <div class="legend-item"><div class="legend-dot" style="background:var(--accent-pink)"></div> Manual Entry</div>
+        <div class="legend-item"><div class="legend-dot" style="background:var(--accent-red)"></div> Legal/Regulatory</div>
+        <div class="legend-item"><div class="legend-dot" style="background:var(--accent-purple)"></div> Hover columns for details</div>
+    </div>
+</div>
+
+</div><!-- /page-main -->
+
+<!-- ═══ RULES PANEL ═══ -->
+<aside class="rules-panel">
+    <div class="rules-panel-header">
+        <h2>Cleaning Rules</h2>
+        <p>20 rules applied in sequence during the pipeline</p>
+    </div>
+    <div class="rules-list">
+        <div class="rule-item"><div class="rule-item-header"><span class="rule-num">R1</span><span class="rule-name">Midnight Rollover</span></div><div class="rule-desc">Fix timestamps with hour 24:xx by rolling to next day at 00:xx. e.g., <code>28-02 24:15</code> becomes <code>01-03 00:15</code>.</div><div class="rule-meta"><span class="rule-meta-tag meta-col">TS</span><span class="rule-meta-tag meta-type">Datetime</span></div></div>
+
+        <div class="rule-item"><div class="rule-item-header"><span class="rule-num">R2</span><span class="rule-name">Unicode Unit Fix</span></div><div class="rule-desc">Normalize unicode <code>&micro;g/m&sup3;</code> to ASCII <code>ug/m3</code>. Prevents string mismatch in downstream joins.</div><div class="rule-meta"><span class="rule-meta-tag meta-col">Unit</span><span class="rule-meta-tag meta-type">String</span></div></div>
+
+        <div class="rule-item"><div class="rule-item-header"><span class="rule-num">R3</span><span class="rule-name">Status Trim &amp; Case</span></div><div class="rule-desc">Strip leading/trailing whitespace and normalize casing. <code>" ok "</code> &rarr; <code>OK</code>, <code>" FAULT "</code> &rarr; <code>FAULT</code>.</div><div class="rule-meta"><span class="rule-meta-tag meta-col">Status</span><span class="rule-meta-tag meta-type">String</span></div></div>
+
+        <div class="rule-item"><div class="rule-item-header"><span class="rule-num">R4</span><span class="rule-name">Lat/Lon Validation</span></div><div class="rule-desc">Parse the Lat_Lon string, validate coordinates fall within India (Lat 6&ndash;36&deg;, Lon 68&ndash;98&deg;). Fix semicolons, detect swapped lat/lon, flag impossible values like -999.</div><div class="rule-meta"><span class="rule-meta-tag meta-col">Lat_Lon</span><span class="rule-meta-tag meta-type">Geospatial</span></div></div>
+
+        <div class="rule-item"><div class="rule-item-header"><span class="rule-num">R5</span><span class="rule-name">Negative Removal</span></div><div class="rule-desc">Flag and discard physically impossible negative pollutant readings. Concentrations cannot be below zero.</div><div class="rule-meta"><span class="rule-meta-tag meta-col">PM2.5, SO2, NOx</span><span class="rule-meta-tag meta-type">Numeric</span></div></div>
+
+        <div class="rule-item"><div class="rule-item-header"><span class="rule-num">R6</span><span class="rule-name">Duplicate Merge</span></div><div class="rule-desc">Detect duplicate rows by <code>Plant_ID + TS</code> composite key. Keep the first occurrence, log dropped duplicates.</div><div class="rule-meta"><span class="rule-meta-tag meta-col">Plant_ID + TS</span><span class="rule-meta-tag meta-type">Dedup</span></div></div>
+
+        <div class="rule-item"><div class="rule-item-header"><span class="rule-num">R7</span><span class="rule-name">Zero/Span Calibration</span></div><div class="rule-desc">Apply sensor drift correction: <code>corrected = (raw - Zero_Drift) / Span_Mult</code>. Uses values from <code>sensor_master</code>.</div><div class="rule-meta"><span class="rule-meta-tag meta-dataset">sensor_master</span><span class="rule-meta-tag meta-col">Zero_Drift, Span_Mult</span></div></div>
+
+        <div class="rule-item"><div class="rule-item-header"><span class="rule-num">R8</span><span class="rule-name">Spike Detection (Hampel)</span></div><div class="rule-desc">Identify and cap extreme outliers (9999, 8500, etc.) using a Hampel filter on a rolling window. Replace spikes with the rolling median.</div><div class="rule-meta"><span class="rule-meta-tag meta-col">PM2.5, SO2, NOx</span><span class="rule-meta-tag meta-type">Outlier</span></div></div>
+
+        <div class="rule-item"><div class="rule-item-header"><span class="rule-num">R9</span><span class="rule-name">Gap Detection &amp; Fill</span></div><div class="rule-desc">Detect missing 15-min intervals by checking Record_ID gaps. Insert filler rows and forward-fill pollutant values from the last valid reading.</div><div class="rule-meta"><span class="rule-meta-tag meta-col">Record_ID, TS</span><span class="rule-meta-tag meta-type">Imputation</span></div></div>
+
+        <div class="rule-item"><div class="rule-item-header"><span class="rule-num">R10</span><span class="rule-name">Maintenance Downtime</span></div><div class="rule-desc">Cross-reference <code>maintenance_logs</code> time windows. If a raw reading falls during maintenance, null the pollutant values and force <code>Status = MAINT</code>.</div><div class="rule-meta"><span class="rule-meta-tag meta-dataset">maintenance_logs</span><span class="rule-meta-tag meta-col">Maint_Start, Maint_End</span></div></div>
+
+        <div class="rule-item"><div class="rule-item-header"><span class="rule-num">R11</span><span class="rule-name">Below Detection Limit</span></div><div class="rule-desc">Replace BDL strings (<code>&lt;2.0</code>, <code>BDL</code>, <code>&lt; 5.0</code>) with <code>LOD / 2</code> from <code>sensor_master</code>. Converts text to a usable numeric value.</div><div class="rule-meta"><span class="rule-meta-tag meta-dataset">sensor_master</span><span class="rule-meta-tag meta-col">LOD_PM25, LOD_SO2, LOD_NOx</span></div></div>
+
+        <div class="rule-item"><div class="rule-item-header"><span class="rule-num">R12</span><span class="rule-name">Status Mapping</span></div><div class="rule-desc">Map non-standard status strings to canonical values: <code>offline/down</code> &rarr; <code>FAULT</code>, <code>maintenance</code> &rarr; <code>MAINT</code>, <code>Error 404</code> &rarr; <code>FAULT</code>.</div><div class="rule-meta"><span class="rule-meta-tag meta-col">Status</span><span class="rule-meta-tag meta-type">Enum</span></div></div>
+
+        <div class="rule-item"><div class="rule-item-header"><span class="rule-num">R13</span><span class="rule-name">Plant-Stack Mapping</span></div><div class="rule-desc">Validate every <code>Plant_ID + Stack_ID</code> combo in raw data exists in <code>sensor_master</code>. Flag orphaned records with no matching sensor.</div><div class="rule-meta"><span class="rule-meta-tag meta-dataset">sensor_master</span><span class="rule-meta-tag meta-col">Plant_ID, Stack_ID</span></div></div>
+
+        <div class="rule-item"><div class="rule-item-header"><span class="rule-num">R14</span><span class="rule-name">Unit Conversion (mg/Nm3)</span></div><div class="rule-desc">Convert <code>mg/Nm3</code> to <code>ug/m3</code> by multiplying the pollutant value by 1000. Then standardize the unit string.</div><div class="rule-meta"><span class="rule-meta-tag meta-col">Unit, PM2.5, SO2, NOx</span><span class="rule-meta-tag meta-type">Conversion</span></div></div>
+
+        <div class="rule-item"><div class="rule-item-header"><span class="rule-num">R15</span><span class="rule-name">Source Type Tagging</span></div><div class="rule-desc">Add a <code>Source_Type</code> column by joining on <code>sensor_master</code>. Tags each row as "Stack" or "Ambient" for threshold lookups.</div><div class="rule-meta"><span class="rule-meta-tag meta-dataset">sensor_master</span><span class="rule-meta-tag meta-col">Source_Type, Stack_ID</span></div></div>
+
+        <div class="rule-item"><div class="rule-item-header"><span class="rule-num">R16</span><span class="rule-name">Double-Entry QC Check</span></div><div class="rule-desc">Compare <code>Lab_PM25_Entry1</code> vs <code>Entry2</code> in <code>manual_entries</code>. If they differ by &gt;1%, flag as <code>QC_FAIL</code> (likely decimal typo).</div><div class="rule-meta"><span class="rule-meta-tag meta-dataset">manual_entries</span><span class="rule-meta-tag meta-col">Entry1, Entry2</span></div></div>
+
+        <div class="rule-item"><div class="rule-item-header"><span class="rule-num">R17</span><span class="rule-name">UTC &rarr; IST Conversion</span></div><div class="rule-desc">Detect timestamps ending with <code>UTC</code> suffix and convert to Indian Standard Time by adding +5:30.</div><div class="rule-meta"><span class="rule-meta-tag meta-col">TS</span><span class="rule-meta-tag meta-type">Timezone</span></div></div>
+
+        <div class="rule-item"><div class="rule-item-header"><span class="rule-num">R18</span><span class="rule-name">PII Redaction</span></div><div class="rule-desc">Regex scan <code>Inspection_Notes</code> for phone numbers (10-digit) and email addresses. Replace matches with <code>[REDACTED]</code>.</div><div class="rule-meta"><span class="rule-meta-tag meta-dataset">manual_entries</span><span class="rule-meta-tag meta-col">Inspection_Notes</span></div></div>
+
+        <div class="rule-item"><div class="rule-item-header"><span class="rule-num">R19</span><span class="rule-name">Regulatory Threshold Check</span></div><div class="rule-desc">Join <code>regulatory_thresholds</code> on <code>Pollutant + Source_Type</code>. Flag any cleaned reading exceeding the <code>Legal_Limit_ugm3</code>.</div><div class="rule-meta"><span class="rule-meta-tag meta-dataset">regulatory_thresholds</span><span class="rule-meta-tag meta-col">Legal_Limit_ugm3</span></div></div>
+
+        <div class="rule-item"><div class="rule-item-header"><span class="rule-num">R20</span><span class="rule-name">Audit Trail Hash</span></div><div class="rule-desc">Generate a SHA-256 hash for each cleaned row to create a tamper-proof audit column. Any post-cleaning modification will break the hash.</div><div class="rule-meta"><span class="rule-meta-tag meta-type">Audit</span><span class="rule-meta-tag meta-col">All columns</span></div></div>
+    </div>
+</aside>
+
+</div><!-- /page-layout -->
+
+<!-- Tooltip -->
+<div class="tooltip" id="tooltip"></div>
+
+<script>
+// ─────────────────────────────────────────────────────────────────
+// COLUMN METADATA — hover tooltips
+// ─────────────────────────────────────────────────────────────────
+const COLUMN_DATA = {
+    // ── raw_cems_data ──
+    'raw-record_id': {
+        title: 'Record_ID',
+        desc: 'Unique identifier for every reading. Sequential format E00001 to E28800. Gaps in sequence indicate Rule 9 (missing data rows).',
+        type: 'String (e.g., E00001)',
+        why: 'Primary key for audit trail. Gaps in IDs reveal where the pipeline needs to generate filler rows.'
+    },
+    'raw-plant_id': {
+        title: 'Plant_ID',
+        desc: 'Identifies the physical plant or monitoring location. Stack sensors use PL-XX format, ambient sensors use LOC-CITY-XX format.',
+        type: 'String (PL-01, LOC-DEL-01)',
+        why: 'Foreign key to sensor_master. Used for duplicate detection (Rule 6) and mapping validation (Rule 13).',
+        rules: 'R6 (Duplicate merge by Plant_ID + TS), R13 (Stack↔Plant mapping validation)'
+    },
+    'raw-stack_id': {
+        title: 'Stack_ID',
+        desc: 'Identifies the specific sensor/chimney at a plant. S-XX for stack sensors, A-XX for ambient monitoring stations.',
+        type: 'String (S-01, A-01)',
+        why: 'Combined with Plant_ID, uniquely identifies every sensor. Essential for maintenance cross-referencing and source type tagging.',
+        rules: 'R10 (Maintenance downtime match), R13 (Mapping validation), R15 (Ambient vs Stack tagging)'
+    },
+    'raw-flow_rate': {
+        title: 'Flow_Rate_m3_hr',
+        desc: 'Exhaust gas flow rate through the stack chimney. Ambient sensors report 0 or NULL since city air isn\'t pushed through a chimney.',
+        type: 'Float (1000.0–5000.0) or 0/NULL',
+        why: 'Needed for Transformation #3 (emission load = concentration × flow). The 0/NULL for ambient sensors is intentional, not an error.'
+    },
+    'raw-ts': {
+        title: 'TS (Timestamp)',
+        desc: 'When the reading was taken. 15-minute intervals. Intentionally messy to test datetime cleaning.',
+        type: 'String → Datetime',
+        why: 'Backbone of the time-series. Must be cleaned before any time-based analysis.',
+        rules: 'R1 (24:xx midnight rollover → next day 00:xx), R17 (UTC timezone → IST conversion)',
+        messy: '90% clean (DD-MM-YYYY HH:MM) · 5% have 24:xx hour (needs midnight rollover) · 5% have UTC suffix (needs IST conversion +5:30)'
+    },
+    'raw-pm25': {
+        title: 'PM2.5 (µg/m³)',
+        desc: 'Fine particulate matter concentration. The most health-critical pollutant. Normal range: 15–400 µg/m³.',
+        type: 'Mixed (Float, String, or gap)',
+        why: 'Primary pollutant for AQI calculation, health risk index, and regulatory compliance.',
+        rules: 'R5 (Negative → flag/discard), R8 (Spike 9999 → Hampel filter), R9 (Gap → forward-fill), R11 (BDL string → half LOD value)',
+        messy: '85% normal floats · 5% impossible negatives (-5.0) · 5% BDL strings ("<2.0", "BDL") · 3% spikes (9999, 8500) · 2% missing rows (gaps)'
+    },
+    'raw-so2': {
+        title: 'SO2 (µg/m³)',
+        desc: 'Sulfur dioxide concentration. Industrial pollutant from coal/fuel combustion. Same messy distribution as PM2.5.',
+        type: 'Mixed (Float, String, or gap)',
+        why: 'Key pollutant for industrial compliance and acid rain assessment.',
+        rules: 'R5 (Negatives), R8 (Spikes), R9 (Gaps), R11 (BDL)',
+        messy: '85% normal · 5% negatives · 5% BDL · 3% spikes · 2% gaps'
+    },
+    'raw-nox': {
+        title: 'NOx (µg/m³)',
+        desc: 'Nitrogen oxides concentration. Produced by high-temperature combustion. Same messy distribution as PM2.5 and SO2.',
+        type: 'Mixed (Float, String, or gap)',
+        why: 'Key pollutant for ozone precursor analysis and vehicular emission tracking.',
+        rules: 'R5 (Negatives), R8 (Spikes), R9 (Gaps), R11 (BDL)',
+        messy: '85% normal · 5% negatives · 5% BDL · 3% spikes · 2% gaps'
+    },
+    'raw-unit': {
+        title: 'Unit',
+        desc: 'Measurement unit for pollutant concentrations. Should be ug/m3 but IoT sensors and lab equipment often report differently.',
+        type: 'String (ug/m3)',
+        why: 'Must be standardized before any calculations, otherwise mg/Nm3 values (1000x smaller denominator) will be compared incorrectly.',
+        rules: 'R2 (Unicode µg/m³ → ug/m3), R14 (mg/Nm3 → multiply value by 1000)',
+        messy: '80% correct ug/m3 · 10% unicode µg/m³ (display issue) · 10% mg/Nm3 (requires value conversion × 1000)'
+    },
+    'raw-status': {
+        title: 'Status',
+        desc: 'Sensor operational status. Should be OK, FAULT, or MAINT — but IoT devices send inconsistent text.',
+        type: 'String (OK/FAULT/MAINT)',
+        why: 'Critical for data quality. FAULT/MAINT readings should be excluded from compliance calculations.',
+        rules: 'R3 (Trim whitespace + normalize casing), R12 (Map non-standard → OK/FAULT/MAINT)',
+        messy: '70% clean (OK/FAULT/MAINT) · 30% messy (" ok ", "offline", "down", "Error 404", "maintenance")'
+    },
+    'raw-latlon': {
+        title: 'Lat_Lon',
+        desc: 'GPS coordinates of the sensor. Stored as a single comma-separated string. A few records have impossible values or wrong separators.',
+        type: 'String (lat,lon)',
+        why: 'Needed for spatial interpolation, mapping, and hotspot detection.',
+        rules: 'R4 (Parse + validate: check lat 6-36°, lon 68-98° for India, fix semicolons)',
+        messy: '98% valid (13.0827,80.2707) · 2% invalid (impossible coords like -999.0, semicolons, swapped lat/lon)'
+    },
+
+    // ── sensor_master ──
+    'sm-plant_id': { title: 'Plant_ID', desc: 'Foreign key matching to raw_cems_data. Identifies which plant this sensor belongs to.', type: 'String', why: 'Used in Rule 13 to validate that every Plant_ID in raw data has a corresponding sensor_master entry.', rules: 'R13 (Mapping validation)' },
+    'sm-stack_id': { title: 'Stack_ID', desc: 'Combined with Plant_ID, uniquely identifies every sensor in the network.', type: 'String', why: 'Rule 13 ensures no orphaned data — every raw record must have a valid sensor.', rules: 'R13 (Mapping validation)' },
+    'sm-source_type': { title: 'Source_Type', desc: '"Stack" = industrial chimney sensor. "Ambient" = outdoor city air monitor. Determines which regulatory limits apply.', type: 'String (Stack/Ambient)', why: 'Rule 15 tags each raw record as Stack or Ambient. Rule 19 then joins different legal limits based on this.', rules: 'R15 (Source tagging), R19 (Threshold joins)' },
+    'sm-sector': { title: 'Sector', desc: 'Industry type — Cement, Steel, Power, or City. Used for sector-level analysis and emission factor application.', type: 'String', why: 'Used in Transformation #12 (emission factor application by sector) during the analysis phase.' },
+    'sm-zero_drift': { title: 'Zero_Drift', desc: 'How much the sensor\'s zero point has drifted from calibration. Positive = reads too high, negative = reads too low.', type: 'Float (-0.5 to 0.8)', why: 'Rule 7 subtracts this drift from every raw reading: corrected = raw_value - zero_drift.', rules: 'R7 (Zero/Span calibration)' },
+    'sm-span_mult': { title: 'Span_Mult', desc: 'Span calibration multiplier. 1.00 = perfect. >1.0 = sensor reads too high, <1.0 = reads too low.', type: 'Float (0.98 to 1.10)', why: 'Rule 7 divides every raw reading by this: corrected = (raw - zero_drift) / span_mult.', rules: 'R7 (Zero/Span calibration)' },
+    'sm-lod_pm25': { title: 'LOD_PM25', desc: 'Limit of Detection for PM2.5. The lowest concentration this sensor can reliably measure.', type: 'Float (1.0 or 2.0 or 5.0)', why: 'Rule 11 replaces "<2.0" or "BDL" strings with LOD/2 (half the detection limit).', rules: 'R11 (BDL handling)' },
+    'sm-lod_so2': { title: 'LOD_SO2', desc: 'Limit of Detection for SO2. Varies by sensor quality — ambient sensors have lower LOD (more sensitive).', type: 'Float (2.0 to 5.0)', why: 'Same as LOD_PM25 — used in Rule 11 to replace below-detection strings with LOD/2.', rules: 'R11 (BDL handling)' },
+    'sm-lod_nox': { title: 'LOD_NOx', desc: 'Limit of Detection for NOx. Higher LOD means the sensor cannot distinguish low NOx concentrations.', type: 'Float (2.0 to 5.0)', why: 'Same as other LODs — Rule 11 substitution.', rules: 'R11 (BDL handling)' },
+
+    // ── maintenance_logs ──
+    'ml-plant_id': { title: 'Plant_ID', desc: 'Which plant the maintenance was performed at. Matches to raw_cems_data and sensor_master.', type: 'String', why: 'Used with Stack_ID and time window to find raw data rows that overlap with maintenance periods.', rules: 'R10 (Downtime labeling)' },
+    'ml-stack_id': { title: 'Stack_ID', desc: 'Which specific sensor was being serviced.', type: 'String', why: 'Combined with Plant_ID, identifies the exact sensor under maintenance.', rules: 'R10 (Downtime labeling)' },
+    'ml-maint_start': { title: 'Maint_Start', desc: 'When the maintenance window began. Any raw data during this window is unreliable.', type: 'Datetime (DD-MM-YYYY HH:MM)', why: 'Rule 10: If raw_cems timestamp falls between Maint_Start and Maint_End for the same sensor, delete the pollutant values and force Status = MAINT.', rules: 'R10 (Downtime labeling)' },
+    'ml-maint_end': { title: 'Maint_End', desc: 'When the maintenance window ended. Sensor data after this point is valid again.', type: 'Datetime (DD-MM-YYYY HH:MM)', why: 'Defines the end boundary of the maintenance exclusion window.', rules: 'R10 (Downtime labeling)' },
+    'ml-technician': { title: 'Technician', desc: 'Name of the technician or team that performed the maintenance. For logging/audit purposes.', type: 'String', why: 'Not used in any cleaning rule — purely for audit trail and accountability.' },
+
+    // ── manual_entries ──
+    'me-log_id': { title: 'Log_ID', desc: 'Unique identifier for each manual lab entry. Format: L0001.', type: 'String', why: 'Primary key for the manual entries table.' },
+    'me-plant_id': { title: 'Plant_ID', desc: 'Which plant this lab sample was taken from.', type: 'String', why: 'Links the lab result back to the sensor data for cross-validation.', rules: 'R16 (QC check)' },
+    'me-entry1': { title: 'Lab_PM25_Entry1', desc: 'First technician\'s reading of the PM2.5 lab sample. Double-entry system for quality control.', type: 'Float', why: 'Rule 16: Compare Entry1 vs Entry2. If they differ by more than 1%, flag as QC_FAIL — likely a human typing error.', rules: 'R16 (Double-entry QC)', messy: '90% matching (within 1%) · 10% QC failure (e.g., 45.0 vs 450.0 — decimal point typo)' },
+    'me-entry2': { title: 'Lab_PM25_Entry2', desc: 'Second technician\'s reading of the same sample. Should match Entry1 within 1% tolerance.', type: 'Float', why: 'The comparison target for Rule 16. Large discrepancies indicate human error.', rules: 'R16 (Double-entry QC)', messy: '90% matching · 10% significant discrepancy (10x factor, digit swap, or shifted value)' },
+    'me-notes': { title: 'Inspection_Notes', desc: 'Free-text notes from field inspections. Sometimes contains personal information that must be redacted.', type: 'String', why: 'Rule 18: Regex scan for phone numbers and email addresses, replace with [REDACTED].', rules: 'R18 (PII removal)', messy: '80% clean notes · 20% contain PII (phone numbers like 9876543210, emails like amit@email.com)' },
+
+    // ── regulatory_thresholds ──
+    'rt-pollutant': { title: 'Pollutant', desc: 'Which pollutant this limit applies to: PM2.5, SO2, or NOx.', type: 'String', why: 'Rule 19 joins this table to the cleaned data, matching on pollutant type and source type to flag exceedances.', rules: 'R19 (Regulatory threshold joins)' },
+    'rt-source_type': { title: 'Source_Type', desc: 'Whether this limit is for Ambient (city air) or Stack (chimney). Stack limits are much higher because emissions are concentrated.', type: 'String (Ambient/Stack)', why: 'Rule 15 must tag raw data BEFORE Rule 19 can join. PM2.5 limit: 60 µg/m³ for Ambient vs 150 µg/m³ for Stack.', rules: 'R15 (Tagging first), R19 (Join)' },
+    'rt-limit': { title: 'Legal_Limit_ugm3', desc: 'The government-mandated maximum concentration. Exceedance = potential fine or enforcement action.', type: 'Float', why: 'Rule 19 compares every cleaned pollutant reading against this limit and flags violations.', rules: 'R19 (Exceedance flagging)' },
+};
+
+// ─────────────────────────────────────────────────────────────────
+// TOOLTIP LOGIC
+// ─────────────────────────────────────────────────────────────────
+const tooltipEl = document.getElementById('tooltip');
+let tooltipVisible = false;
+
+document.querySelectorAll('.col-row').forEach(row => {
+    row.addEventListener('mouseenter', (e) => {
+        const key = row.dataset.col;
+        const data = COLUMN_DATA[key];
+        if (!data) return;
+
+        let html = `<div class="tooltip-title">${data.title}</div>`;
+        html += `<div class="tooltip-desc">${data.desc}</div>`;
+
+        html += `<div class="tooltip-section">
+            <div class="tooltip-label">Data Type</div>
+            <div class="tooltip-value">${data.type}</div>
+        </div>`;
+
+        html += `<div class="tooltip-section">
+            <div class="tooltip-label">Why It's Needed</div>
+            <div class="tooltip-value">${data.why}</div>
+        </div>`;
+
+        if (data.rules) {
+            html += `<div class="tooltip-section">
+                <div class="tooltip-label">Cleaning Rules</div>
+                <div class="tooltip-value">${data.rules}</div>
+            </div>`;
+        }
+
+        if (data.messy) {
+            html += `<div class="tooltip-messy">
+                <strong>⚡ Messy Distribution:</strong><br>${data.messy}
+            </div>`;
+        }
+
+        tooltipEl.innerHTML = html;
+        tooltipEl.classList.add('active');
+        tooltipVisible = true;
+        positionTooltip(e);
+    });
+
+    row.addEventListener('mousemove', (e) => {
+        if (tooltipVisible) positionTooltip(e);
+    });
+
+    row.addEventListener('mouseleave', () => {
+        tooltipEl.classList.remove('active');
+        tooltipVisible = false;
+    });
+});
+
+function positionTooltip(e) {
+    const tt = tooltipEl;
+    const pad = 16;
+    let x = e.clientX + pad;
+    let y = e.clientY + pad;
+
+    // prevent overflow right
+    if (x + tt.offsetWidth > window.innerWidth - pad) {
+        x = e.clientX - tt.offsetWidth - pad;
+    }
+    // prevent overflow bottom
+    if (y + tt.offsetHeight > window.innerHeight - pad) {
+        y = e.clientY - tt.offsetHeight - pad;
+    }
+
+    tt.style.left = x + 'px';
+    tt.style.top = y + 'px';
+}
+</script>
+
+</body>
+</html>
