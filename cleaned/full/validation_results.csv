@@ -41,5 +41,5 @@ R19,Exceedance flags are correct (spot-check),PASS,"Checked 100 rows, mismatches
 R20,Audit_Hash column exists,PASS,Sample: d71814caf8869de7...
 R20,All hashes are 64 characters (SHA-256),PASS,Hash lengths: [64]
 AUDIT,Audit log is non-empty,PASS,124145 entries
-AUDIT,All cleaning rules appear in audit log,FAIL,Missing: {'TS_FMT'}
-AUDIT,Audit log has all required columns,FAIL,"Columns: ['Record_ID', 'Column', 'Old_Value', 'New_Value', 'Rule']"
+AUDIT,All cleaning rules appear in audit log,PASS,"Rules logged: ['R1', 'R10', 'R11', 'R12', 'R14', 'R17', 'R2', 'R3', 'R4', 'R5', 'R7', 'R8', 'R9', 'TS_FORMAT']"
+AUDIT,Audit log has all required columns,PASS,"Columns: ['Record_ID', 'Column', 'Old', 'New', 'Rule']"

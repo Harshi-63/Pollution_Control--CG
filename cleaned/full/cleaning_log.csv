@@ -1,4 +1,4 @@
-Record_ID,Column,Old_Value,New_Value,Rule
+Record_ID,Column,Old,New,Rule
 E00002,Unit,µg/m³,ug/m3,R2
 E00024,Unit,µg/m³,ug/m3,R2
 E00025,Unit,µg/m³,ug/m3,R2

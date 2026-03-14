@@ -1,51 +1,11 @@
 Log_ID,Plant_ID,Lab_PM25_Entry1,Lab_PM25_Entry2,Inspection_Notes,Diff_Pct,QC_Status
-L0001,PL-03,98.7,987.0,Data logger memory at 45%. No action required.,900.0,QC_FAIL
-L0002,PL-01,156.4,156.7,Power backup tested. UPS functional.,0.1918158567774827,QC_PASS
-L0003,LOC-DEL-01,49.6,49.2,Routine inspection. All systems nominal.,0.8064516129032229,QC_PASS
-L0004,PL-01,123.7,124.2,Data logger memory at 45%. No action required.,0.40420371867421184,QC_PASS
-L0005,PL-03,132.9,132.8,Inspection passed. Signed off by Vikram [REDACTED_EMAIL] [REDACTED_PHONE]).,0.07524454477049985,QC_PASS
-L0006,LOC-BLR-01,69.9,699.0,System broken. Call Amit at [REDACTED_PHONE] or [REDACTED_EMAIL],900.0,QC_FAIL
-L0007,PL-01,86.8,87.1,Communication link stable. GPRS signal strong.,0.34562211981566493,QC_PASS
-L0008,LOC-BLR-01,149.0,149.3,Sensor readings within expected range.,0.20134228187920225,QC_PASS
-L0009,PL-01,122.2,122.0,Routine inspection. All systems nominal.,0.16366612111293194,QC_PASS
-L0010,PL-03,44.4,44.5,System broken. Call Amit at [REDACTED_PHONE] or [REDACTED_EMAIL],0.22522522522522842,QC_PASS
-L0011,PL-03,17.4,174.0,System log reviewed. No anomalies detected.,900.0,QC_FAIL
-L0012,LOC-BLR-01,149.1,148.9,Checked laser. System operational.,0.13413816230716877,QC_PASS
-L0013,PL-02,90.2,90.1,Sensor drift detected. Contact Priya at [REDACTED_PHONE] for calibration.,0.11086474501109593,QC_PASS
-L0014,LOC-MUM-01,49.4,49.0,Laser replaced by tech Suresh. Reach him at [REDACTED_EMAIL] or [REDACTED_PHONE].,0.8097165991902806,QC_PASS
-L0015,PL-03,112.5,112.4,Checked laser. System operational.,0.08888888888888384,QC_PASS
-L0016,LOC-DEL-02,74.9,75.2,Sensor readings within expected range.,0.4005340453938547,QC_PASS
-L0017,LOC-MUM-01,66.2,65.8,Routine inspection. All systems nominal.,0.6042296072507639,QC_PASS
-L0018,LOC-MUM-01,19.3,19.7,Communication link stable. GPRS signal strong.,2.072538860103619,QC_FAIL
-L0019,LOC-BLR-01,13.3,13.7,Data logger memory at 45%. No action required.,3.0075187969924704,QC_FAIL
-L0020,LOC-DEL-02,154.9,155.0,Data logger memory at 45%. No action required.,0.06455777921239142,QC_PASS
-L0021,PL-03,17.9,17.7,Laser replaced by tech Suresh. Reach him at [REDACTED_EMAIL] or [REDACTED_PHONE].,1.117318435754186,QC_FAIL
-L0022,LOC-DEL-02,100.9,100.7,Filter condition: good. No replacement needed.,0.19821605550049837,QC_PASS
-L0023,PL-03,150.7,150.8,Sensor drift detected. Contact Priya at [REDACTED_PHONE] for calibration.,0.0663570006635851,QC_PASS
-L0024,PL-01,136.7,136.3,Recalibrated by vendor. Invoice to [REDACTED_EMAIL] Mobile: [REDACTED_PHONE].,0.29261155815653056,QC_PASS
-L0025,PL-03,120.5,120.0,Ambient station check. Enclosure clean.,0.4149377593360996,QC_PASS
-L0026,LOC-BLR-01,159.5,159.6,Urgent: fan malfunction. Notify [REDACTED_EMAIL] immediately. Ph: [REDACTED_PHONE].,0.06269592476488672,QC_PASS
-L0027,LOC-DEL-02,90.7,907.0,Quarterly calibration completed successfully.,900.0,QC_FAIL
-L0028,LOC-DEL-02,109.8,109.9,Ambient station check. Enclosure clean.,0.09107468123862343,QC_PASS
-L0029,PL-03,85.5,85.4,Routine inspection. All systems nominal.,0.11695906432747873,QC_PASS
-L0030,PL-03,149.0,149.5,Routine inspection. All systems nominal.,0.33557046979865773,QC_PASS
-L0031,LOC-DEL-02,130.0,230.2,Data logger memory at 45%. No action required.,77.07692307692307,QC_FAIL
-L0032,LOC-BLR-01,125.6,125.8,Filter condition: good. No replacement needed.,0.15923566878981119,QC_PASS
-L0033,PL-01,46.4,46.1,Quarterly calibration completed successfully.,0.6465517241379249,QC_PASS
-L0034,PL-01,143.8,144.3,System broken. Call Amit at [REDACTED_PHONE] or [REDACTED_EMAIL],0.3477051460361613,QC_PASS
-L0035,PL-03,154.1,153.7,Inspection passed. Signed off by Vikram [REDACTED_EMAIL] [REDACTED_PHONE]).,0.25957170668397517,QC_PASS
-L0036,PL-01,39.7,39.9,Filter condition: good. No replacement needed.,0.5037783375314754,QC_PASS
-L0037,PL-03,124.4,124.1,Ambient station check. Enclosure clean.,0.2411575562701056,QC_PASS
-L0038,PL-01,172.0,23.8,Data logger memory at 45%. No action required.,86.16279069767441,QC_FAIL
-L0039,PL-01,89.4,89.7,System broken. Call Amit at [REDACTED_PHONE] or [REDACTED_EMAIL],0.3355704697986545,QC_PASS
-L0040,PL-03,105.5,105.0,Quarterly calibration completed successfully.,0.47393364928909953,QC_PASS
-L0041,PL-02,140.9,141.4,Sensor readings within expected range.,0.35486160397444994,QC_PASS
-L0042,LOC-DEL-02,147.7,148.0,System log reviewed. No anomalies detected.,0.2031144211239075,QC_PASS
-L0043,PL-03,119.5,280.5,Pump failure. Escalate to Team Lead Rajesh at [REDACTED_EMAIL] or [REDACTED_PHONE].,134.72803347280336,QC_FAIL
-L0044,PL-01,120.1,120.3,Filter replaced. Logged by Meena [REDACTED_EMAIL] Emergency: [REDACTED_PHONE].,0.16652789342215057,QC_PASS
-L0045,PL-01,162.4,162.1,System log reviewed. No anomalies detected.,0.18472906403941586,QC_PASS
-L0046,PL-03,133.3,133.1,Data logger memory at 45%. No action required.,0.1500375093773571,QC_PASS
-L0047,PL-01,15.6,15.7,Checked laser. System operational.,0.6410256410256387,QC_PASS
-L0048,LOC-BLR-01,137.9,137.6,Quarterly calibration completed successfully.,0.21754894851342377,QC_PASS
-L0049,PL-01,172.7,173.2,Laser replaced by tech Suresh. Reach him at [REDACTED_EMAIL] or [REDACTED_PHONE].,0.28951939779965263,QC_PASS
-L0050,PL-01,159.0,158.7,Filter replaced. Logged by Meena [REDACTED_EMAIL] Emergency: [REDACTED_PHONE].,0.18867924528302601,QC_PASS
+L0001,PL-01,75.8,76.0,Inspection passed. Signed off by Vikram [REDACTED_EMAIL] [REDACTED_PHONE]).,0.2638522427440671,QC_PASS
+L0002,PL-02,71.7,10.3,Quarterly calibration completed successfully.,85.63458856345886,QC_FAIL
+L0003,LOC-MUM-01,196.1,196.0,Communication link stable. GPRS signal strong.,0.05099439061702923,QC_PASS
+L0004,PL-03,101.0,101.3,Quarterly calibration completed successfully.,0.29702970297029424,QC_PASS
+L0005,LOC-DEL-02,19.6,19.4,System log reviewed. No anomalies detected.,1.0204081632653206,QC_FAIL
+L0006,LOC-DEL-02,163.9,164.1,Checked laser. System operational.,0.12202562538132314,QC_PASS
+L0007,PL-03,69.4,69.1,Data logger memory at 45%. No action required.,0.4322766570605351,QC_PASS
+L0008,LOC-BLR-01,128.1,128.1,Routine inspection. All systems nominal.,0.0,QC_PASS
+L0009,LOC-DEL-01,62.4,62.4,Data logger memory at 45%. No action required.,0.0,QC_PASS
+L0010,PL-03,58.0,58.2,System broken. Call Amit at [REDACTED_PHONE] or [REDACTED_EMAIL],0.34482758620690146,QC_PASS
