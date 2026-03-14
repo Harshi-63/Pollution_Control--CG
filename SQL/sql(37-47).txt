@@ -1,3 +1,5 @@
+Q37. Group customers into spending buckets.--->
+
 SQL> SELECT customer_id,
   2  NTILE(4) OVER(ORDER BY total_spent)
   3  FROM
@@ -24,6 +26,8 @@ CUSTOMER_ID NTILE(4)OVER(ORDERBYTOTAL_SPENT)
           1                                4
 
 10 rows selected.
+------------------------------------------------------------------------------------------------------------
+Q38. Bucket orders into size categories--->
 
 SQL> SELECT order_id,
   2  CASE
@@ -51,6 +55,8 @@ SQL> SELECT order_id,
         12 SMALL
 
 13 rows selected.
+----------------------------------------------------------------------------------------------------------
+Q39. Categorize payments based on amount buckets-->
 
 SQL> SELECT payment_id,
   2  CASE
@@ -76,6 +82,8 @@ PAYMENT_ID CASEWH
         12 HIGH
 
 12 rows selected.
+-------------------------------------------------------------------------------------------------------
+Q40. Bucket products by inventory age.--->
 
 SQL> SELECT inventory_id,
   2  CASE
@@ -99,6 +107,8 @@ INVENTORY_ID CASEWH
           10 OLD
 
 10 rows selected.
+---------------------------------------------------------------------------------------------------
+Q41. Create weekly sales buckets.--->
 
 SQL> SELECT TRUNC(o.order_date,'IW') week_start,
   2  SUM(oi.quantity*p.price)
@@ -124,6 +134,8 @@ WEEK_STAR SUM(OI.QUANTITY*P.PRICE)
 04-MAR-24                    13500
 
 13 rows selected.
+------------------------------------------------------------------------------------------------------
+Q42. Bucket customers by order-value distribution.---->
 
 SQL> SELECT customer_id,
   2  NTILE(4) OVER(ORDER BY order_value)
@@ -151,6 +163,8 @@ CUSTOMER_ID NTILE(4)OVER(ORDERBYORDER_VALUE)
           1                                4
 
 10 rows selected.
+-------------------------------------------------------------------------------------------------------
+Q43. Categorize products by sales frequency.--->
 
 SQL> SELECT product_id,
   2  COUNT(*)
@@ -171,6 +185,8 @@ PRODUCT_ID   COUNT(*)
         10          2
 
 10 rows selected.
+----------------------------------------------------------------------------------------------------------
+Q44. Bucket customers by average order gap.--->
 
 SQL> SELECT customer_id,
   2  AVG(order_date-prev_order)
@@ -199,6 +215,8 @@ CUSTOMER_ID AVG(ORDER_DATE-PREV_ORDER)
          12
 
 12 rows selected.
+-----------------------------------------------------------------------------------------
+Q45. Rank customers by total ordered amount; return top 5 per email domain.--->
 
 SQL> SELECT *
   2  FROM
@@ -231,6 +249,8 @@ frank@yahoo.com                                                                 
 iris@yahoo.com                                                                                                 9        5000          3
 
 10 rows selected.
+--------------------------------------------------------------------------------------------------------------
+Q46. Compute running total of sales per customer.---->
 
 SQL> SELECT o.customer_id,
   2  o.order_date,
@@ -274,6 +294,8 @@ CUSTOMER_ID ORDER_DAT SUM(OI.QUANTITY*P.PRICE)OVER(PARTITIONBYO.CUSTOMER_IDORDER
          10 18-JUN-24                                                                      3000
 
 30 rows selected.
+----------------------------------------------------------------------------------------------------------------
+Q47. Find first and last orders using window functions.---->
 
 SQL> SELECT customer_id,
   2  MIN(order_date),
@@ -297,5 +319,6 @@ CUSTOMER_ID MIN(ORDER MAX(ORDER
          12 10-AUG-24 10-AUG-24
 
 12 rows selected.
+--------------------------------------------------------------------------------------------------------
 
 SQL> spool off
