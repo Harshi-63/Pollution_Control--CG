@@ -1,11 +1,11 @@
 Log_ID,Plant_ID,Lab_PM25_Entry1,Lab_PM25_Entry2,Inspection_Notes
-L0001,PL-02,176.2,175.8,Checked laser. System operational.
-L0002,PL-03,145.0,144.9,Ambient station check. Enclosure clean.
-L0003,LOC-DEL-02,75.2,74.8,Data logger memory at 45%. No action required.
-L0004,LOC-DEL-02,181.6,181.5,Sensor readings within expected range.
-L0005,PL-03,195.2,1952.0,Checked laser. System operational.
-L0006,PL-03,176.0,36.2,Data logger memory at 45%. No action required.
-L0007,PL-01,99.3,99.5,Routine inspection. All systems nominal.
-L0008,LOC-DEL-01,149.0,149.2,Power backup tested. UPS functional.
-L0009,PL-01,123.1,123.5,Quarterly calibration completed successfully.
-L0010,PL-03,157.1,157.0,Recalibrated by vendor. Invoice to anita@vendorcorp.co.in. Mobile: 8080808080.
+L0001,PL-01,75.8,76.0,"Inspection passed. Signed off by Vikram (vikram.s@gov.in, 9090909090)."
+L0002,PL-02,71.7,10.3,Quarterly calibration completed successfully.
+L0003,LOC-MUM-01,196.1,196.0,Communication link stable. GPRS signal strong.
+L0004,PL-03,101.0,101.3,Quarterly calibration completed successfully.
+L0005,LOC-DEL-02,19.6,19.4,System log reviewed. No anomalies detected.
+L0006,LOC-DEL-02,163.9,164.1,Checked laser. System operational.
+L0007,PL-03,69.4,69.1,Data logger memory at 45%. No action required.
+L0008,LOC-BLR-01,128.1,128.1,Routine inspection. All systems nominal.
+L0009,LOC-DEL-01,62.4,62.4,Data logger memory at 45%. No action required.
+L0010,PL-03,58.0,58.2,System broken. Call Amit at 9876543210 or amit@email.com.
