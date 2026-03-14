@@ -1,0 +1,11 @@
+Log_ID,Plant_ID,Lab_PM25_Entry1,Lab_PM25_Entry2,Inspection_Notes
+L0001,PL-02,176.2,175.8,Checked laser. System operational.
+L0002,PL-03,145.0,144.9,Ambient station check. Enclosure clean.
+L0003,LOC-DEL-02,75.2,74.8,Data logger memory at 45%. No action required.
+L0004,LOC-DEL-02,181.6,181.5,Sensor readings within expected range.
+L0005,PL-03,195.2,1952.0,Checked laser. System operational.
+L0006,PL-03,176.0,36.2,Data logger memory at 45%. No action required.
+L0007,PL-01,99.3,99.5,Routine inspection. All systems nominal.
+L0008,LOC-DEL-01,149.0,149.2,Power backup tested. UPS functional.
+L0009,PL-01,123.1,123.5,Quarterly calibration completed successfully.
+L0010,PL-03,157.1,157.0,Recalibrated by vendor. Invoice to anita@vendorcorp.co.in. Mobile: 8080808080.
