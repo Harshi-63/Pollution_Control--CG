@@ -1,3 +1,5 @@
+Q25. Using CTEs, create a customer purchase summary.--->
+
 SQL> WITH summary AS
   2  (
   3  SELECT o.customer_id,
@@ -24,6 +26,8 @@ CUSTOMER_ID TOTAL_SPENT
          10        3000
 
 10 rows selected.
+--------------------------------------------------------------------------------------------------------
+Q26. Identify top 1% customers by spending using CTE.--->
 
 SQL> WITH spend AS
   2  (
@@ -45,6 +49,8 @@ SQL> WITH spend AS
 CUSTOMER_ID TOTAL_SPENT     BUCKET
 ----------- ----------- ----------
           1       97900          1
+-------------------------------------------------------------------------------------------------------
+Q27. Find products with declining monthly order quantities.--->
 
 SQL> SELECT product_id,month,qty,
   2  LAG(qty) OVER(PARTITION BY product_id ORDER BY month)
@@ -90,6 +96,8 @@ PRODUCT_ID      MONTH        QTY LAG(QTY)OVER(PARTITIONBYPRODUCT_IDORDERBYMONTH)
         10          6          1                                               2
 
 28 rows selected.
+--------------------------------------------------------------------------------------------------------
+Q28. Find inventory gaps using CTE to compare ordered vs on-hand quantities.--->
 
 SQL> WITH ordered AS
   2  (
@@ -104,6 +112,8 @@ SQL> WITH ordered AS
  11  AND o.total_ordered>i.quantity_on_hand;
 
 no rows selected
+----------------------------------------------------------------------------------------------------------
+Q29. Compute running total of payments per customer using CTE.---->
 
 SQL> SELECT o.customer_id,
   2  p.payment_date,
@@ -128,6 +138,8 @@ CUSTOMER_ID PAYMENT_D SUM(P.AMOUNT)OVER(PARTITIONBYO.CUSTOMER_IDORDERBYP.PAYMENT
          12 11-AUG-24                                                             8000
 
 12 rows selected.
+-------------------------------------------------------------------------------------------------------
+Q30. Identify products that go out of stock after orders.---->
 
 SQL> SELECT p.product_id
   2  FROM products p,inventory i,order_items oi
@@ -139,6 +151,8 @@ SQL> SELECT p.product_id
 PRODUCT_ID
 ----------
          7
+---------------------------------------------------------------------------------------------------
+Q31. Flag orders without payments using CTE.---->
 
 SQL> WITH unpaid AS
   2  (
@@ -155,6 +169,8 @@ SQL> WITH unpaid AS
          5
         14
         11
+---------------------------------------------------------------------------------------------------------
+Q32. Compute average fulfillment time using CTE.--->
 
 SQL> SELECT AVG(p.payment_date-o.order_date)
   2  FROM orders o,payments p
@@ -163,6 +179,8 @@ SQL> SELECT AVG(p.payment_date-o.order_date)
 AVG(P.PAYMENT_DATE-O.ORDER_DATE)
 --------------------------------
                             1.25
+--------------------------------------------------------------------------------------------------------------
+Q33. Track duplicate ordered products using CTE.---->
 
 SQL> WITH dup AS
   2  (
@@ -175,6 +193,8 @@ SQL> WITH dup AS
   9  WHERE cnt>1;
 
 no rows selected
+-------------------------------------------------------------------------------------------------------------
+Q34. Bucket products into 5 equal price groups via CTE.---->
 
 SQL> SELECT product_id,
   2  NTILE(5) OVER(ORDER BY price)
@@ -194,6 +214,8 @@ PRODUCT_ID NTILE(5)OVER(ORDERBYPRICE)
          1                          5
 
 10 rows selected.
+----------------------------------------------------------------------------------------------------
+Q35. Find orders that exceed twice the customer’s average order size.---->
 
 SQL> WITH order_val AS
   2  (
@@ -212,16 +234,8 @@ SQL> WITH order_val AS
  15  WHERE ov.customer_id=order_val.customer_id);
 
 no rows selected
-
-SQL> SELECT NTILE(10) OVER(ORDER BY price) band,
-  2  COUNT(*)
-  3  FROM products
-  4  GROUP BY NTILE(10) OVER(ORDER BY price);
-GROUP BY NTILE(10) OVER(ORDER BY price)
-         *
-ERROR at line 4:
-ORA-30483: window  functions are not allowed here
-
+---------------------------------------------------------------------------------------------------------------
+Q36. Bucket products into 10 price bands and count orders.--->
 
 SQL> SELECT band,COUNT(*)
   2  FROM(
@@ -244,5 +258,6 @@ SQL> SELECT band,COUNT(*)
         10          1
 
 10 rows selected.
+------------------------------------------------------------------------------------------------------
 
 SQL> spool off
