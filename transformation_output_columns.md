@@ -51,9 +51,9 @@ The original cleaned CEMS data with **30+ new columns** added on top.
 
 ---
 
-## 2. `compliance_report.csv` — Rule T6
+## 2. `compliance_report.csv` — Rule T6 (Overall)
 
-One row per **plant**. Shows how often they stay within legal limits.
+One row per **plant**. Shows how often they stay within legal limits across the full time period.
 
 | Column | Description |
 |--------|-------------|
@@ -64,7 +64,21 @@ One row per **plant**. Shows how often they stay within legal limits.
 
 ---
 
-## 3. `penalty_estimate.csv` — Rule T19
+## 3. `compliance_report_monthly.csv` — Rule T6 (Monthly)
+
+Same as above but **broken down by month**. Tracks whether a plant is improving or worsening over time.
+
+| Column | Description |
+|--------|-------------|
+| Plant_ID | Factory identifier |
+| Month | Year-Month period (e.g., `2025-01`) |
+| Total_Readings | Readings in that month |
+| Exceedances | Exceedances in that month |
+| Compliance_Rate_Pct | Monthly compliance percentage |
+
+---
+
+## 4. `penalty_estimate.csv` — Rule T19
 
 Financial penalties based on how badly and how long each plant exceeded limits.
 
@@ -79,7 +93,7 @@ Financial penalties based on how badly and how long each plant exceeded limits.
 
 ---
 
-## 4. `episodes.csv` — Rule T7
+## 5. `episodes.csv` — Rule T7
 
 Sustained high-pollution events (readings > 2× legal limit for at least 1 hour).
 
@@ -94,7 +108,7 @@ Sustained high-pollution events (readings > 2× legal limit for at least 1 hour)
 
 ---
 
-## 5. `hotspot_ranking.csv` — Rule T17
+## 6. `hotspot_ranking.csv` — Rule T17
 
 Ranks ALL locations by pollution intensity and persistence.
 
@@ -110,7 +124,7 @@ Ranks ALL locations by pollution intensity and persistence.
 
 ---
 
-## 6. `drift_alarms.csv` — Rule T13
+## 7. `drift_alarms.csv` — Rule T13
 
 Sensors that show suspicious data drift (CUSUM change-point detection).
 
@@ -123,7 +137,7 @@ Sensors that show suspicious data drift (CUSUM change-point detection).
 
 ---
 
-## 7. `spatial_grid.csv` — Rule T8
+## 8. `spatial_grid.csv` — Rule T8
 
 A 10×10 lat/lon grid with estimated PM2.5 values (for map visualization).
 
@@ -135,7 +149,7 @@ A 10×10 lat/lon grid with estimated PM2.5 values (for map visualization).
 
 ---
 
-## 8. `hourly_profile.csv` — Rule T10
+## 9. `hourly_profile.csv` — Rule T10
 
 Average pollutant levels by hour-of-day (0–23). Shows daily pollution rhythm.
 
@@ -148,7 +162,7 @@ Average pollutant levels by hour-of-day (0–23). Shows daily pollution rhythm.
 
 ---
 
-## 9. `model_features.csv` — Rule T16
+## 10. `model_features.csv` — Rule T16
 
 ML-ready feature table for PM2.5 forecasting.
 
@@ -163,7 +177,7 @@ ML-ready feature table for PM2.5 forecasting.
 
 ---
 
-## 10 & 11. `regulatory_report_stack.csv` & `regulatory_report_ambient.csv` — Rule T15
+## 11 & 12. `regulatory_report_stack.csv` & `regulatory_report_ambient.csv` — Rule T15
 
 CPCB-format daily summary reports, split by source type.
 
@@ -178,7 +192,7 @@ CPCB-format daily summary reports, split by source type.
 
 ---
 
-## 12. `emission_factor_comparison.csv` — Rule T12
+## 13. `emission_factor_comparison.csv` — Rule T12
 
 Compares actual measured emissions vs expected from AP-42 emission factors.
 
@@ -191,7 +205,7 @@ Compares actual measured emissions vs expected from AP-42 emission factors.
 
 ---
 
-## 13. `control_impact.csv` — Rule T18
+## 14. `control_impact.csv` — Rule T18
 
 Pre/post analysis of pollution control equipment installations.
 
@@ -206,7 +220,7 @@ Pre/post analysis of pollution control equipment installations.
 
 ---
 
-## 14. `gap_analysis.csv` — Rule T14
+## 15. `gap_analysis.csv` — Rule T14
 
 Data availability analysis per sensor.
 
@@ -225,7 +239,7 @@ Data availability analysis per sensor.
 
 ---
 
-## 15. `open_data_extract.csv` — Rule T20
+## 16. `open_data_extract.csv` — Rule T20
 
 Privacy-safe public version of the dataset.
 
