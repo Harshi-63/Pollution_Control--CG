@@ -1,7 +1,7 @@
 Sector,Pollutant,EF_kg_per_ton,Avg_Measured_Load
 Cement,PM2.5,0.85,0.0104
-Cement,SO2,1.2,0.0108
-Cement,NOx,2.5,0.0107
+Cement,SO2,1.2,0.0107
+Cement,NOx,2.5,0.0108
 Steel,PM2.5,0.45,0.0097
 Steel,SO2,0.9,0.0108
 Steel,NOx,1.8,0.0102
