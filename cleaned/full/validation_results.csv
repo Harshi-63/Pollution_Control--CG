@@ -1,0 +1,45 @@
+Rule,Check,Status,Detail
+SCHEMA,All expected columns present,PASS,14 columns verified
+SCHEMA,Pollutant columns are float64,PASS,"PM2.5=float64, SO2=float64, NOx=float64"
+SCHEMA,TS is datetime64,PASS,dtype=datetime64[ns]
+R1,No midnight rollover (24:xx) — all timestamps parsed,PASS,"TS nulls=2415, gap_filled=2415 (should match)"
+R1,Audit log has midnight rollover entries,PASS,797 changes logged
+R2,No unicode µg/m³ remaining,PASS,Found: 0
+R2,Audit log has unit standardization entries,PASS,2623 changes logged
+R3,No leading/trailing whitespace in Status,PASS,Found: 0
+R3,All Status values are uppercase,PASS,Found: 0
+R4,No semicolons in Lat_Lon,PASS,Found: 0
+R4,All coordinates within India bounds,PASS,Invalid: 0
+R5,No negatives in PM2.5,PASS,Found: 0
+R5,No negatives in SO2,PASS,Found: 0
+R5,No negatives in NOx,PASS,Found: 0
+R6,No duplicate rows (Plant+Stack+TS),PASS,Duplicates: 0
+R7,Calibration adjustments were made,PASS,73900 adjustments logged
+R8,No spikes > 5000 in PM2.5,PASS,"Found: 0, max=2499.9"
+R8,No spikes > 5000 in SO2,PASS,"Found: 0, max=2499.9"
+R8,No spikes > 5000 in NOx,PASS,"Found: 0, max=2550.8"
+R9,Record_IDs are continuous (no gaps),PASS,Missing IDs: 0
+R9,GAP_FILLED rows have NaN pollutant values,PASS,2415 gap-filled rows
+R10,All rows during maintenance have Status=MAINT,PASS,Violations: 0
+R11,No BDL strings in PM2.5,PASS,Found: 0
+R11,No BDL strings in SO2,PASS,Found: 0
+R11,No BDL strings in NOx,PASS,Found: 0
+R12,Only canonical status values exist,PASS,"Values: {'UNKNOWN', 'MAINT', 'OK', 'GAP_FILLED', 'FAULT'}"
+R13,All Plant+Stack combos exist in sensor_master,PASS,All valid
+R14,No mg/Nm3 unit remaining,PASS,Found: 0
+R14,All units are ug/m3,PASS,Values: {'ug/m3': 28800}
+R15,Source_Type column exists,PASS,"Values: {'Stack': 15801, 'Ambient': 10584, 'Unknown': 2415}"
+R15,Source_Type has valid values only,PASS,"Values: {'Unknown', 'Ambient', 'Stack'}"
+R16,QC_Status column exists in manual entries,PASS,"Values: {'QC_PASS': 40, 'QC_FAIL': 10}"
+R16,QC_Status correctly flags >1% differences,PASS,Logic verified
+R17,UTC-to-IST conversions were made,PASS,1292 conversions logged
+R17,Date range is in 2025 (post-conversion),PASS,2025-01-01 00:00:00 to 2025-01-30 23:45:00
+R18,No unredacted PII in Inspection_Notes,PASS,Unredacted PII: 0
+R18,Redacted notes exist (proving PII was found & fixed),PASS,16 notes contain [REDACTED]
+R19,Exceedance_Flag column exists,PASS,"Values: {'EXCEEDANCE': 16983, 'OK': 11817}"
+R19,Exceedance flags are correct (spot-check),PASS,"Checked 100 rows, mismatches: 0"
+R20,Audit_Hash column exists,PASS,Sample: d71814caf8869de7...
+R20,All hashes are 64 characters (SHA-256),PASS,Hash lengths: [64]
+AUDIT,Audit log is non-empty,PASS,124306 entries
+AUDIT,All cleaning rules appear in audit log,PASS,"Rules logged: ['R1', 'R10', 'R11', 'R12', 'R14', 'R17', 'R2', 'R3', 'R4', 'R4b', 'R5', 'R7', 'R8', 'R9', 'TS_FORMAT']"
+AUDIT,Audit log has all required columns,PASS,"Columns: ['Record_ID', 'Column', 'Old', 'New', 'Rule']"

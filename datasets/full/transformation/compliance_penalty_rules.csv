@@ -1,0 +1,10 @@
+Pollutant,Severity,Threshold_Pct_Over,Fine_INR_per_Hour
+PM2.5,Minor,0.0,10000
+PM2.5,Moderate,50.0,25000
+PM2.5,Major,100.0,50000
+SO2,Minor,0.0,8000
+SO2,Moderate,50.0,20000
+SO2,Major,100.0,40000
+NOx,Minor,0.0,12000
+NOx,Moderate,50.0,30000
+NOx,Major,100.0,60000

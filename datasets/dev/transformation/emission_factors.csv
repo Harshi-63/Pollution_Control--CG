@@ -1,0 +1,10 @@
+Sector,Pollutant,Emission_Factor_kg_per_ton
+Cement,PM2.5,0.85
+Cement,SO2,1.2
+Cement,NOx,2.5
+Steel,PM2.5,0.45
+Steel,SO2,0.9
+Steel,NOx,1.8
+Power,PM2.5,0.3
+Power,SO2,8.0
+Power,NOx,3.5

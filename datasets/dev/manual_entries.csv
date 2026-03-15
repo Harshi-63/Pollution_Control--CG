@@ -1,0 +1,11 @@
+Log_ID,Plant_ID,Lab_PM25_Entry1,Lab_PM25_Entry2,Inspection_Notes
+L0001,PL-01,75.8,76.0,"Inspection passed. Signed off by Vikram (vikram.s@gov.in, 9090909090)."
+L0002,PL-02,71.7,10.3,Quarterly calibration completed successfully.
+L0003,LOC-MUM-01,196.1,196.0,Communication link stable. GPRS signal strong.
+L0004,PL-03,101.0,101.3,Quarterly calibration completed successfully.
+L0005,LOC-DEL-02,19.6,19.4,System log reviewed. No anomalies detected.
+L0006,LOC-DEL-02,163.9,164.1,Checked laser. System operational.
+L0007,PL-03,69.4,69.1,Data logger memory at 45%. No action required.
+L0008,LOC-BLR-01,128.1,128.1,Routine inspection. All systems nominal.
+L0009,LOC-DEL-01,62.4,62.4,Data logger memory at 45%. No action required.
+L0010,PL-03,58.0,58.2,System broken. Call Amit at 9876543210 or amit@email.com.

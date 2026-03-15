@@ -1,0 +1,51 @@
+Log_ID,Plant_ID,Lab_PM25_Entry1,Lab_PM25_Entry2,Inspection_Notes
+L0001,PL-03,98.7,987.0,Data logger memory at 45%. No action required.
+L0002,PL-01,156.4,156.7,Power backup tested. UPS functional.
+L0003,LOC-DEL-01,49.6,49.2,Routine inspection. All systems nominal.
+L0004,PL-01,123.7,124.2,Data logger memory at 45%. No action required.
+L0005,PL-03,132.9,132.8,"Inspection passed. Signed off by Vikram (vikram.s@gov.in, 9090909090)."
+L0006,LOC-BLR-01,69.9,699.0,System broken. Call Amit at 9876543210 or amit@email.com.
+L0007,PL-01,86.8,87.1,Communication link stable. GPRS signal strong.
+L0008,LOC-BLR-01,149.0,149.3,Sensor readings within expected range.
+L0009,PL-01,122.2,122.0,Routine inspection. All systems nominal.
+L0010,PL-03,44.4,44.5,System broken. Call Amit at 9876543210 or amit@email.com.
+L0011,PL-03,17.4,174.0,System log reviewed. No anomalies detected.
+L0012,LOC-BLR-01,149.1,148.9,Checked laser. System operational.
+L0013,PL-02,90.2,90.1,Sensor drift detected. Contact Priya at 8765432109 for calibration.
+L0014,LOC-MUM-01,49.4,49.0,Laser replaced by tech Suresh. Reach him at suresh.p@company.org or 7654321098.
+L0015,PL-03,112.5,112.4,Checked laser. System operational.
+L0016,LOC-DEL-02,74.9,75.2,Sensor readings within expected range.
+L0017,LOC-MUM-01,66.2,65.8,Routine inspection. All systems nominal.
+L0018,LOC-MUM-01,19.3,19.7,Communication link stable. GPRS signal strong.
+L0019,LOC-BLR-01,13.3,13.7,Data logger memory at 45%. No action required.
+L0020,LOC-DEL-02,154.9,155.0,Data logger memory at 45%. No action required.
+L0021,PL-03,17.9,17.7,Laser replaced by tech Suresh. Reach him at suresh.p@company.org or 7654321098.
+L0022,LOC-DEL-02,100.9,100.7,Filter condition: good. No replacement needed.
+L0023,PL-03,150.7,150.8,Sensor drift detected. Contact Priya at 8765432109 for calibration.
+L0024,PL-01,136.7,136.3,Recalibrated by vendor. Invoice to anita@vendorcorp.co.in. Mobile: 8080808080.
+L0025,PL-03,120.5,120.0,Ambient station check. Enclosure clean.
+L0026,LOC-BLR-01,159.5,159.6,Urgent: fan malfunction. Notify ravi.k@gmail.com immediately. Ph: 9988776655.
+L0027,LOC-DEL-02,90.7,907.0,Quarterly calibration completed successfully.
+L0028,LOC-DEL-02,109.8,109.9,Ambient station check. Enclosure clean.
+L0029,PL-03,85.5,85.4,Routine inspection. All systems nominal.
+L0030,PL-03,149.0,149.5,Routine inspection. All systems nominal.
+L0031,LOC-DEL-02,130.0,230.2,Data logger memory at 45%. No action required.
+L0032,LOC-BLR-01,125.6,125.8,Filter condition: good. No replacement needed.
+L0033,PL-01,46.4,46.1,Quarterly calibration completed successfully.
+L0034,PL-01,143.8,144.3,System broken. Call Amit at 9876543210 or amit@email.com.
+L0035,PL-03,154.1,153.7,"Inspection passed. Signed off by Vikram (vikram.s@gov.in, 9090909090)."
+L0036,PL-01,39.7,39.9,Filter condition: good. No replacement needed.
+L0037,PL-03,124.4,124.1,Ambient station check. Enclosure clean.
+L0038,PL-01,172.0,23.8,Data logger memory at 45%. No action required.
+L0039,PL-01,89.4,89.7,System broken. Call Amit at 9876543210 or amit@email.com.
+L0040,PL-03,105.5,105.0,Quarterly calibration completed successfully.
+L0041,PL-02,140.9,141.4,Sensor readings within expected range.
+L0042,LOC-DEL-02,147.7,148.0,System log reviewed. No anomalies detected.
+L0043,PL-03,119.5,280.5,Pump failure. Escalate to Team Lead Rajesh at rajesh@plant.com or 7070707070.
+L0044,PL-01,120.1,120.3,Filter replaced. Logged by Meena (meena.d@monitoring.org). Emergency: 6060606060.
+L0045,PL-01,162.4,162.1,System log reviewed. No anomalies detected.
+L0046,PL-03,133.3,133.1,Data logger memory at 45%. No action required.
+L0047,PL-01,15.6,15.7,Checked laser. System operational.
+L0048,LOC-BLR-01,137.9,137.6,Quarterly calibration completed successfully.
+L0049,PL-01,172.7,173.2,Laser replaced by tech Suresh. Reach him at suresh.p@company.org or 7654321098.
+L0050,PL-01,159.0,158.7,Filter replaced. Logged by Meena (meena.d@monitoring.org). Emergency: 6060606060.

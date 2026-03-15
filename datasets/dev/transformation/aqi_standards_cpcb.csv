@@ -1,0 +1,16 @@
+Pollutant,Conc_Low,Conc_High,AQI_Low,AQI_High,Category
+PM2.5,0.0,30.0,0,50,Good
+PM2.5,30.1,60.0,51,100,Satisfactory
+PM2.5,60.1,90.0,101,200,Moderate
+PM2.5,90.1,120.0,201,300,Poor
+PM2.5,120.1,250.0,301,400,Very Poor
+SO2,0.0,40.0,0,50,Good
+SO2,40.1,80.0,51,100,Satisfactory
+SO2,80.1,380.0,101,200,Moderate
+SO2,380.1,800.0,201,300,Poor
+SO2,800.1,1600.0,301,400,Very Poor
+NOx,0.0,40.0,0,50,Good
+NOx,40.1,80.0,51,100,Satisfactory
+NOx,80.1,180.0,101,200,Moderate
+NOx,180.1,280.0,201,300,Poor
+NOx,280.1,400.0,301,400,Very Poor
