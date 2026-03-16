@@ -1,0 +1,5 @@
+# Virtual environment
+myenv/
+
+# Temporary verification script
+tmp_verify_r4b.py
