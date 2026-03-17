@@ -1,0 +1,1 @@
+pytest s:/1.capg_case_Study/notebooks/tests/

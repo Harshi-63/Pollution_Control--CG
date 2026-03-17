@@ -1,0 +1,11 @@
+Plant_ID,Stack_ID,Source_Type,Sector,Zero_Drift,Span_Mult,LOD_PM25,LOD_SO2,LOD_NOx
+PL-01,S-01,Stack,Cement,0.5,1.02,2.0,4.0,5.0
+PL-01,S-02,Stack,Cement,0.2,0.98,2.0,4.0,5.0
+PL-02,S-01,Stack,Steel,-0.5,1.05,2.0,5.0,5.0
+PL-03,S-01,Stack,Power,0.8,1.1,5.0,5.0,5.0
+PL-03,S-02,Stack,Power,0.1,1.0,5.0,5.0,5.0
+PL-03,S-03,Stack,Power,0.0,1.01,5.0,5.0,5.0
+LOC-DEL-01,A-01,Ambient,City,0.1,1.0,1.0,2.0,2.0
+LOC-DEL-02,A-02,Ambient,City,0.0,0.99,1.0,2.0,2.0
+LOC-MUM-01,A-01,Ambient,City,-0.1,1.02,1.0,2.0,2.0
+LOC-BLR-01,A-01,Ambient,City,0.2,1.0,1.0,2.0,2.0

@@ -1,0 +1,6 @@
+Plant_ID,Stack_ID,Measure_Type,Install_Date
+PL-01,S-01,Wet Scrubber,2025-01-04
+PL-02,S-02,Electrostatic Precipitator,2025-01-05
+PL-03,S-03,Baghouse Filter,2025-01-03
+PL-05,S-06,Wet Scrubber,2025-01-06
+PL-07,S-09,SCR (DeNOx),2025-01-15

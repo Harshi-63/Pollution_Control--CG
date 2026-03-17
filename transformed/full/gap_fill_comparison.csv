@@ -1,0 +1,4 @@
+Pollutant,Values_Filled,Fill_Rate_Pct,Raw_Mean,Filled_Mean,Mean_Change_Pct,Raw_Std,Filled_Std,Raw_Compliance_Pct,Filled_Compliance_Pct
+PM2.5,1662,6.36,141.79,141.83,0.03,122.44,121.36,16.32,15.86
+SO2,1729,6.61,145.97,145.93,-0.03,156.01,154.06,23.32,22.98
+NOx,1706,6.53,142.75,142.79,0.03,145.53,143.43,33.26,32.88

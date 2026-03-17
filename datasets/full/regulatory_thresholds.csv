@@ -1,0 +1,7 @@
+Pollutant,Source_Type,Legal_Limit_ugm3
+PM2.5,Ambient,60.0
+PM2.5,Stack,150.0
+SO2,Ambient,80.0
+SO2,Stack,200.0
+NOx,Ambient,80.0
+NOx,Stack,400.0
